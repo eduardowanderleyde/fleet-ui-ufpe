@@ -1,0 +1,31 @@
+# Modo robô real: `make robot-up` (docker compose -f docker-compose.yml -f docker-compose.robot.yml up).
+# O serviço "sim" deixa de subir o Gazebo e sobe só mapa + AMCL + Nav2 contra o
+# TurtleBot4 de verdade; fleet/backend usam o relógio do sistema e o mesmo
+# middleware do robô (CycloneDDS no CIn).
+x-robot-env: &robot-env
+  ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-0}
+  RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
+  FLEET_USE_SIM_TIME: "false"
+
+services:
+  sim:
+    command: ["/workspace/docker/run-robot.sh"]
+    environment:
+      <<: *robot-env
+      ROBOT_MAP: ${ROBOT_MAP:-hall_cin_v4}
+      X_POSE: ${X_POSE:-1.0216323137283325}
+      Y_POSE: ${Y_POSE:-16.61626625061035}
+      YAW: ${YAW:-0.0}
+      NAV2_DEFAULT_SERVER_TIMEOUT_MS: ${NAV2_DEFAULT_SERVER_TIMEOUT_MS:-1000}
+      NAV2_NAVFN_USE_ASTAR: ${NAV2_NAVFN_USE_ASTAR:-true}
+  fleet:
+    environment:
+      <<: *robot-env
+      FLEET_START_DELAY: ${FLEET_START_DELAY:-10}
+  backend:
+    environment:
+      <<: *robot-env
+      BACKEND_START_DELAY: ${BACKEND_START_DELAY:-14}
+  frontend:
+    environment:
+      <<: *robot-env

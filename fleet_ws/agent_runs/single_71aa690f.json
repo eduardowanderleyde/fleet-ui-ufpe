@@ -1,0 +1,991 @@
+{
+  "kind": "single",
+  "job_id": "71aa690f",
+  "running": false,
+  "steps": [
+    {
+      "tool_name": "list_robots",
+      "tool_input": {},
+      "result": [
+        ""
+      ]
+    },
+    {
+      "tool_name": "list_routes",
+      "tool_input": {},
+      "result": [
+        "cursor_smoke02",
+        "cursor_smoke03",
+        "cursor_visible01",
+        "dissertation_clean01",
+        "dissertation_verify01",
+        "loop_fechado",
+        "percurso_initial",
+        "rota_longa_curva",
+        "teste_painel_sim"
+      ]
+    },
+    {
+      "tool_name": "get_robot_status",
+      "tool_input": {
+        "robot_id": ""
+      },
+      "result": {
+        "robot_id": "",
+        "role": "MUUT",
+        "nav_state": "idle",
+        "current_route": "",
+        "collection_on": false,
+        "collection_file": "",
+        "last_error": "",
+        "bytes_written": 0,
+        "pose": {
+          "x": 6.9111284934806315e-12,
+          "y": -7.122178455513003e-27,
+          "yaw": -1.9842154781728843e-15,
+          "valid": true
+        }
+      }
+    },
+    {
+      "tool_name": "run_campaign",
+      "tool_input": {
+        "robot": "",
+        "route": "llm_pilot01",
+        "points": [
+          [
+            0.5,
+            0,
+            0
+          ],
+          [
+            1.0,
+            0,
+            0
+          ]
+        ],
+        "repetitions": 5,
+        "collect": true,
+        "topics": [
+          "odom",
+          "pose",
+          "scan",
+          "imu"
+        ]
+      },
+      "result": {
+        "running": false,
+        "steps": [
+          {
+            "label": "baseline",
+            "lines": [
+              "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py record --route llm_pilot01 --single-robot --topics odom pose scan imu --points=0.5,0.0,0.0;1.0,0.0,0.0 --export /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_baseline.json",
+              "",
+              "=== Fase A: gravar percurso (coleta + record + waypoints) ===",
+              "robot='' route=llm_pilot01 pontos=2",
+              "topics=['odom', 'pose', 'scan', 'imu'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_baseline.json'",
+              "[TRACE] Chamando service enable_collection ...",
+              "[OK] enable_collection — Collection enabled. Bag: collections/default/2026-10-03_02-17-36_192696_b997c008",
+              "[TRACE] Chamando service start_record ...",
+              "[OK] start_record — Recording started",
+              "[TRACE] Esperando TF map->base_link ...",
+              "[OK] TF map->base_link disponível",
+              "[TRACE] Aguardando /map (SLAM) ou settle do costmap (AMCL) ...",
+              "[OK] /map disponível (modo SLAM)",
+              "[TRACE] Aguardando costmap processar mapa (3s) ...",
+              "[TRACE] go_to_point wp1: x=0.500 y=0.000 yaw=0.000",
+              "[OK] go_to_point wp1 (0.50, 0.00, yaw=0.00) — Navigation started",
+              "[OK] wp1 estado navigating",
+              "[OK] wp1 concluído (recording)",
+              "[TRACE] go_to_point wp2: x=1.000 y=0.000 yaw=0.000",
+              "[OK] go_to_point wp2 (1.00, 0.00, yaw=0.00) — Navigation started",
+              "[OK] wp2 estado navigating",
+              "[OK] wp2 concluído (recording)",
+              "[TRACE] Chamando service stop_record ...",
+              "[OK] stop_record — Saved 10 poses to routes/default/llm_pilot01.yaml",
+              "[OK] disable_collection — Collection disabled for default. Bag: collections/default/2026-10-03_02-17-36_192696_b997c008",
+              "",
+              "Resumo: sem falhas",
+              "[TRACE] Duração real (parede): 15.33 s  Percurso teórico: 1.0 m",
+              "[TRACE] bag_metrics: odom=404 msgs  path=0.8347 m  scan=146  imu=2908",
+              "",
+              "[TRACE] Sensor summary (mcap):",
+              "  /scan: 146 msgs  ~10.0 Hz",
+              "  /pose: 6 msgs  ~0.4 Hz",
+              "  /imu: 2908 msgs  ~200.0 Hz",
+              "  /odom: 404 msgs  ~27.8 Hz",
+              "",
+              "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_baseline.json"
+            ],
+            "result": {
+              "command": "record",
+              "robot_id": "",
+              "route": "llm_pilot01",
+              "expected_route_yaml": "routes/default/llm_pilot01.yaml",
+              "points": [
+                [
+                  0.5,
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ]
+              ],
+              "topics": [
+                "odom",
+                "pose",
+                "scan",
+                "imu"
+              ],
+              "skip_collection": false,
+              "success": true,
+              "failures_reported": 0,
+              "error_code": "",
+              "path_length_m_estimate": 0.0,
+              "disable_collection_message": "Collection disabled for default. Bag: collections/default/2026-10-03_02-17-36_192696_b997c008",
+              "rosbag_path": "collections/default/2026-10-03_02-17-36_192696_b997c008",
+              "sensor_summary": {
+                "/scan": {
+                  "msgs": 146,
+                  "hz_est": 10.0
+                },
+                "/pose": {
+                  "msgs": 6,
+                  "hz_est": 0.4
+                },
+                "/imu": {
+                  "msgs": 2908,
+                  "hz_est": 200.0
+                },
+                "/odom": {
+                  "msgs": 404,
+                  "hz_est": 27.8
+                }
+              },
+              "bag_metrics": {
+                "duration_s": 14.54,
+                "odom_path_length_m": 0.835,
+                "odom_avg_speed_ms": 0.057,
+                "scan_avg_valid_points": 360.0,
+                "scan_min_valid_points": 359,
+                "imu_accel_mean_ms2": 9.805,
+                "imu_accel_variance_ms2": 0.0057,
+                "wall_duration_s": 15.33,
+                "theoretical_path_m": 1.0
+              },
+              "protocol_metadata": {
+                "argv": [
+                  "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                  "record",
+                  "--route",
+                  "llm_pilot01",
+                  "--single-robot",
+                  "--topics",
+                  "odom",
+                  "pose",
+                  "scan",
+                  "imu",
+                  "--points=0.5,0.0,0.0;1.0,0.0,0.0",
+                  "--export",
+                  "/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_baseline.json"
+                ]
+              },
+              "finished_at": "2026-10-03T02:17:50.890540+00:00",
+              "git": {
+                "commit": "5db80613eb5f2f20b555f33a9a738f0f3eb1c0ac",
+                "dirty": true
+              }
+            },
+            "error": null,
+            "exit_code": 0
+          },
+          {
+            "label": "replay_01",
+            "lines": [
+              "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route llm_pilot01 --single-robot --topics odom pose scan imu --export /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_01.json",
+              "",
+              "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+              "robot='' route=llm_pilot01",
+              "topics=['odom', 'pose', 'scan', 'imu'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_01.json'",
+              "[TRACE] Chamando service enable_collection ...",
+              "[OK] enable_collection — Collection enabled. Bag: collections/default/2026-10-03_02-17-52_972554_233a10c2",
+              "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+              "[TRACE] Chamando service play_route ...",
+              "[OK] play_route — Navigation started",
+              "[OK] navegação iniciou (navigating)",
+              "[OK] navegação terminou (idle)",
+              "[TRACE] Chamando service disable_collection ...",
+              "[OK] disable_collection — Collection disabled for default. Bag: collections/default/2026-10-03_02-17-52_972554_233a10c2",
+              "",
+              "Resumo: sem falhas",
+              "",
+              "[TRACE] Sensor summary (mcap):",
+              "  /scan: 678 msgs  ~10.0 Hz",
+              "  /pose: 15 msgs  ~0.2 Hz",
+              "  /imu: 13563 msgs  ~200.0 Hz",
+              "  /odom: 1883 msgs  ~27.8 Hz",
+              "[TRACE] bag_metrics: odom=1883 msgs  path=2.0527 m  scan=678  imu=13563",
+              "",
+              "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_01.json"
+            ],
+            "result": {
+              "command": "replay",
+              "robot_id": "",
+              "route": "llm_pilot01",
+              "expected_route_yaml": "routes/default/llm_pilot01.yaml",
+              "topics": [
+                "odom",
+                "pose",
+                "scan",
+                "imu"
+              ],
+              "skip_collection": false,
+              "success": true,
+              "failures_reported": 0,
+              "error_code": "",
+              "path_length_m_estimate": 0.0,
+              "disable_collection_message": "Collection disabled for default. Bag: collections/default/2026-10-03_02-17-52_972554_233a10c2",
+              "rosbag_path": "collections/default/2026-10-03_02-17-52_972554_233a10c2",
+              "sensor_summary": {
+                "/scan": {
+                  "msgs": 678,
+                  "hz_est": 10.0
+                },
+                "/pose": {
+                  "msgs": 15,
+                  "hz_est": 0.2
+                },
+                "/imu": {
+                  "msgs": 13563,
+                  "hz_est": 200.0
+                },
+                "/odom": {
+                  "msgs": 1883,
+                  "hz_est": 27.8
+                }
+              },
+              "bag_metrics": {
+                "duration_s": 67.81,
+                "odom_path_length_m": 2.053,
+                "odom_avg_speed_ms": 0.03,
+                "scan_avg_valid_points": 359.9,
+                "scan_min_valid_points": 359,
+                "imu_accel_mean_ms2": 9.803,
+                "imu_accel_variance_ms2": 0.0031
+              },
+              "protocol_metadata": {
+                "argv": [
+                  "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                  "replay",
+                  "--route",
+                  "llm_pilot01",
+                  "--single-robot",
+                  "--topics",
+                  "odom",
+                  "pose",
+                  "scan",
+                  "imu",
+                  "--export",
+                  "/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_01.json"
+                ]
+              },
+              "finished_at": "2026-10-03T02:19:01.261210+00:00",
+              "git": {
+                "commit": "5db80613eb5f2f20b555f33a9a738f0f3eb1c0ac",
+                "dirty": true
+              }
+            },
+            "error": null,
+            "exit_code": 0
+          },
+          {
+            "label": "replay_02",
+            "lines": [
+              "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route llm_pilot01 --single-robot --topics odom pose scan imu --export /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_02.json",
+              "",
+              "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+              "robot='' route=llm_pilot01",
+              "topics=['odom', 'pose', 'scan', 'imu'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_02.json'",
+              "[TRACE] Chamando service enable_collection ...",
+              "[OK] enable_collection — Collection enabled. Bag: collections/default/2026-10-03_02-19-03_486049_6d32edcb",
+              "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+              "[TRACE] Chamando service play_route ...",
+              "[OK] play_route — Navigation started",
+              "[OK] navegação iniciou (navigating)",
+              "[OK] navegação terminou (idle)",
+              "[TRACE] Chamando service disable_collection ...",
+              "[OK] disable_collection — Collection disabled for default. Bag: collections/default/2026-10-03_02-19-03_486049_6d32edcb",
+              "",
+              "Resumo: sem falhas",
+              "",
+              "[TRACE] Sensor summary (mcap):",
+              "  /scan: 672 msgs  ~10.0 Hz",
+              "  /pose: 16 msgs  ~0.2 Hz",
+              "  /imu: 13455 msgs  ~200.0 Hz",
+              "  /odom: 1869 msgs  ~27.8 Hz",
+              "[TRACE] bag_metrics: odom=1869 msgs  path=2.1583 m  scan=672  imu=13455",
+              "",
+              "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_02.json"
+            ],
+            "result": {
+              "command": "replay",
+              "robot_id": "",
+              "route": "llm_pilot01",
+              "expected_route_yaml": "routes/default/llm_pilot01.yaml",
+              "topics": [
+                "odom",
+                "pose",
+                "scan",
+                "imu"
+              ],
+              "skip_collection": false,
+              "success": true,
+              "failures_reported": 0,
+              "error_code": "",
+              "path_length_m_estimate": 0.0,
+              "disable_collection_message": "Collection disabled for default. Bag: collections/default/2026-10-03_02-19-03_486049_6d32edcb",
+              "rosbag_path": "collections/default/2026-10-03_02-19-03_486049_6d32edcb",
+              "sensor_summary": {
+                "/scan": {
+                  "msgs": 672,
+                  "hz_est": 10.0
+                },
+                "/pose": {
+                  "msgs": 16,
+                  "hz_est": 0.2
+                },
+                "/imu": {
+                  "msgs": 13455,
+                  "hz_est": 200.0
+                },
+                "/odom": {
+                  "msgs": 1869,
+                  "hz_est": 27.8
+                }
+              },
+              "bag_metrics": {
+                "duration_s": 67.27,
+                "odom_path_length_m": 2.158,
+                "odom_avg_speed_ms": 0.032,
+                "scan_avg_valid_points": 359.9,
+                "scan_min_valid_points": 359,
+                "imu_accel_mean_ms2": 9.803,
+                "imu_accel_variance_ms2": 0.0046
+              },
+              "protocol_metadata": {
+                "argv": [
+                  "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                  "replay",
+                  "--route",
+                  "llm_pilot01",
+                  "--single-robot",
+                  "--topics",
+                  "odom",
+                  "pose",
+                  "scan",
+                  "imu",
+                  "--export",
+                  "/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_02.json"
+                ]
+              },
+              "finished_at": "2026-10-03T02:20:11.254351+00:00",
+              "git": {
+                "commit": "5db80613eb5f2f20b555f33a9a738f0f3eb1c0ac",
+                "dirty": true
+              }
+            },
+            "error": null,
+            "exit_code": 0
+          },
+          {
+            "label": "replay_03",
+            "lines": [
+              "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route llm_pilot01 --single-robot --topics odom pose scan imu --export /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_03.json",
+              "",
+              "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+              "robot='' route=llm_pilot01",
+              "topics=['odom', 'pose', 'scan', 'imu'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_03.json'",
+              "[TRACE] Chamando service enable_collection ...",
+              "[OK] enable_collection — Collection enabled. Bag: collections/default/2026-10-03_02-20-15_722187_9e14c246",
+              "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+              "[TRACE] Chamando service play_route ...",
+              "[OK] play_route — Navigation started",
+              "[OK] navegação iniciou (navigating)",
+              "[OK] navegação terminou (idle)",
+              "[TRACE] Chamando service disable_collection ...",
+              "[OK] disable_collection — Collection disabled for default. Bag: collections/default/2026-10-03_02-20-15_722187_9e14c246",
+              "",
+              "Resumo: sem falhas",
+              "",
+              "[TRACE] Sensor summary (mcap):",
+              "  /scan: 671 msgs  ~10.0 Hz",
+              "  /pose: 15 msgs  ~0.2 Hz",
+              "  /imu: 13410 msgs  ~200.0 Hz",
+              "  /odom: 1862 msgs  ~27.8 Hz",
+              "[TRACE] bag_metrics: odom=1862 msgs  path=2.1114 m  scan=671  imu=13410",
+              "",
+              "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_03.json"
+            ],
+            "result": {
+              "command": "replay",
+              "robot_id": "",
+              "route": "llm_pilot01",
+              "expected_route_yaml": "routes/default/llm_pilot01.yaml",
+              "topics": [
+                "odom",
+                "pose",
+                "scan",
+                "imu"
+              ],
+              "skip_collection": false,
+              "success": true,
+              "failures_reported": 0,
+              "error_code": "",
+              "path_length_m_estimate": 0.0,
+              "disable_collection_message": "Collection disabled for default. Bag: collections/default/2026-10-03_02-20-15_722187_9e14c246",
+              "rosbag_path": "collections/default/2026-10-03_02-20-15_722187_9e14c246",
+              "sensor_summary": {
+                "/scan": {
+                  "msgs": 671,
+                  "hz_est": 10.0
+                },
+                "/pose": {
+                  "msgs": 15,
+                  "hz_est": 0.2
+                },
+                "/imu": {
+                  "msgs": 13410,
+                  "hz_est": 200.0
+                },
+                "/odom": {
+                  "msgs": 1862,
+                  "hz_est": 27.8
+                }
+              },
+              "bag_metrics": {
+                "duration_s": 67.04,
+                "odom_path_length_m": 2.111,
+                "odom_avg_speed_ms": 0.031,
+                "scan_avg_valid_points": 360.0,
+                "scan_min_valid_points": 359,
+                "imu_accel_mean_ms2": 9.803,
+                "imu_accel_variance_ms2": 0.0036
+              },
+              "protocol_metadata": {
+                "argv": [
+                  "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                  "replay",
+                  "--route",
+                  "llm_pilot01",
+                  "--single-robot",
+                  "--topics",
+                  "odom",
+                  "pose",
+                  "scan",
+                  "imu",
+                  "--export",
+                  "/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_03.json"
+                ]
+              },
+              "finished_at": "2026-10-03T02:21:23.254687+00:00",
+              "git": {
+                "commit": "5db80613eb5f2f20b555f33a9a738f0f3eb1c0ac",
+                "dirty": true
+              }
+            },
+            "error": null,
+            "exit_code": 0
+          },
+          {
+            "label": "replay_04",
+            "lines": [
+              "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route llm_pilot01 --single-robot --topics odom pose scan imu --export /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_04.json",
+              "",
+              "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+              "robot='' route=llm_pilot01",
+              "topics=['odom', 'pose', 'scan', 'imu'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_04.json'",
+              "[TRACE] Chamando service enable_collection ...",
+              "[OK] enable_collection — Collection enabled. Bag: collections/default/2026-10-03_02-21-27_262159_c438fe10",
+              "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+              "[TRACE] Chamando service play_route ...",
+              "[OK] play_route — Navigation started",
+              "[OK] navegação iniciou (navigating)",
+              "[OK] navegação terminou (idle)",
+              "[TRACE] Chamando service disable_collection ...",
+              "[OK] disable_collection — Collection disabled for default. Bag: collections/default/2026-10-03_02-21-27_262159_c438fe10",
+              "",
+              "Resumo: sem falhas",
+              "",
+              "[TRACE] Sensor summary (mcap):",
+              "  /scan: 686 msgs  ~10.0 Hz",
+              "  /pose: 16 msgs  ~0.2 Hz",
+              "  /imu: 13701 msgs  ~200.0 Hz",
+              "  /odom: 1903 msgs  ~27.8 Hz",
+              "[TRACE] bag_metrics: odom=1903 msgs  path=2.1538 m  scan=686  imu=13701",
+              "",
+              "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_04.json"
+            ],
+            "result": {
+              "command": "replay",
+              "robot_id": "",
+              "route": "llm_pilot01",
+              "expected_route_yaml": "routes/default/llm_pilot01.yaml",
+              "topics": [
+                "odom",
+                "pose",
+                "scan",
+                "imu"
+              ],
+              "skip_collection": false,
+              "success": true,
+              "failures_reported": 0,
+              "error_code": "",
+              "path_length_m_estimate": 0.0,
+              "disable_collection_message": "Collection disabled for default. Bag: collections/default/2026-10-03_02-21-27_262159_c438fe10",
+              "rosbag_path": "collections/default/2026-10-03_02-21-27_262159_c438fe10",
+              "sensor_summary": {
+                "/scan": {
+                  "msgs": 686,
+                  "hz_est": 10.0
+                },
+                "/pose": {
+                  "msgs": 16,
+                  "hz_est": 0.2
+                },
+                "/imu": {
+                  "msgs": 13701,
+                  "hz_est": 200.0
+                },
+                "/odom": {
+                  "msgs": 1903,
+                  "hz_est": 27.8
+                }
+              },
+              "bag_metrics": {
+                "duration_s": 68.5,
+                "odom_path_length_m": 2.154,
+                "odom_avg_speed_ms": 0.031,
+                "scan_avg_valid_points": 359.9,
+                "scan_min_valid_points": 359,
+                "imu_accel_mean_ms2": 9.804,
+                "imu_accel_variance_ms2": 0.0076
+              },
+              "protocol_metadata": {
+                "argv": [
+                  "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                  "replay",
+                  "--route",
+                  "llm_pilot01",
+                  "--single-robot",
+                  "--topics",
+                  "odom",
+                  "pose",
+                  "scan",
+                  "imu",
+                  "--export",
+                  "/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_04.json"
+                ]
+              },
+              "finished_at": "2026-10-03T02:22:36.270407+00:00",
+              "git": {
+                "commit": "5db80613eb5f2f20b555f33a9a738f0f3eb1c0ac",
+                "dirty": true
+              }
+            },
+            "error": null,
+            "exit_code": 0
+          },
+          {
+            "label": "replay_05",
+            "lines": [
+              "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route llm_pilot01 --single-robot --topics odom pose scan imu --export /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_05.json",
+              "",
+              "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+              "robot='' route=llm_pilot01",
+              "topics=['odom', 'pose', 'scan', 'imu'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_05.json'",
+              "[TRACE] Chamando service enable_collection ...",
+              "[OK] enable_collection — Collection enabled. Bag: collections/default/2026-10-03_02-22-39_239775_172112ab",
+              "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+              "[TRACE] Chamando service play_route ...",
+              "[OK] play_route — Navigation started",
+              "[OK] navegação iniciou (navigating)",
+              "[OK] navegação terminou (idle)",
+              "[TRACE] Chamando service disable_collection ...",
+              "[OK] disable_collection — Collection disabled for default. Bag: collections/default/2026-10-03_02-22-39_239775_172112ab",
+              "",
+              "Resumo: sem falhas",
+              "",
+              "[TRACE] Sensor summary (mcap):",
+              "  /scan: 685 msgs  ~10.0 Hz",
+              "  /pose: 15 msgs  ~0.2 Hz",
+              "  /imu: 13705 msgs  ~200.0 Hz",
+              "  /odom: 1904 msgs  ~27.8 Hz",
+              "[TRACE] bag_metrics: odom=1904 msgs  path=2.1518 m  scan=685  imu=13705",
+              "",
+              "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_05.json"
+            ],
+            "result": {
+              "command": "replay",
+              "robot_id": "",
+              "route": "llm_pilot01",
+              "expected_route_yaml": "routes/default/llm_pilot01.yaml",
+              "topics": [
+                "odom",
+                "pose",
+                "scan",
+                "imu"
+              ],
+              "skip_collection": false,
+              "success": true,
+              "failures_reported": 0,
+              "error_code": "",
+              "path_length_m_estimate": 0.0,
+              "disable_collection_message": "Collection disabled for default. Bag: collections/default/2026-10-03_02-22-39_239775_172112ab",
+              "rosbag_path": "collections/default/2026-10-03_02-22-39_239775_172112ab",
+              "sensor_summary": {
+                "/scan": {
+                  "msgs": 685,
+                  "hz_est": 10.0
+                },
+                "/pose": {
+                  "msgs": 15,
+                  "hz_est": 0.2
+                },
+                "/imu": {
+                  "msgs": 13705,
+                  "hz_est": 200.0
+                },
+                "/odom": {
+                  "msgs": 1904,
+                  "hz_est": 27.8
+                }
+              },
+              "bag_metrics": {
+                "duration_s": 68.52,
+                "odom_path_length_m": 2.152,
+                "odom_avg_speed_ms": 0.031,
+                "scan_avg_valid_points": 360.0,
+                "scan_min_valid_points": 359,
+                "imu_accel_mean_ms2": 9.802,
+                "imu_accel_variance_ms2": 0.0056
+              },
+              "protocol_metadata": {
+                "argv": [
+                  "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                  "replay",
+                  "--route",
+                  "llm_pilot01",
+                  "--single-robot",
+                  "--topics",
+                  "odom",
+                  "pose",
+                  "scan",
+                  "imu",
+                  "--export",
+                  "/home/eduardo/fleet-ui/fleet_ws/_campaign_llm_pilot01_4979c065_replay_05.json"
+                ]
+              },
+              "finished_at": "2026-10-03T02:23:48.267008+00:00",
+              "git": {
+                "commit": "5db80613eb5f2f20b555f33a9a738f0f3eb1c0ac",
+                "dirty": true
+              }
+            },
+            "error": null,
+            "exit_code": 0
+          }
+        ],
+        "summary": {
+          "generated_at": "2026-10-03T02:23:49.396836+00:00",
+          "reference_run_index": 0,
+          "reference_label": "baseline",
+          "runs": [
+            {
+              "label": "baseline",
+              "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/default/2026-10-03_02-17-36_192696_b997c008",
+              "traj_topic": "/pose",
+              "num_poses": 6,
+              "duration_sec": 3.701999999999998,
+              "path_length_m": 0.6857136029347144,
+              "start_xy": [
+                0.04696676531991877,
+                -0.009724628680113931
+              ],
+              "end_xy": [
+                0.7314994973941494,
+                -0.0030922769823889464
+              ],
+              "static_traj_warn": false
+            },
+            {
+              "label": "replay_01",
+              "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/default/2026-10-03_02-17-52_972554_233a10c2",
+              "traj_topic": "/pose",
+              "num_poses": 15,
+              "duration_sec": 58.101,
+              "path_length_m": 1.6924716537227014,
+              "start_xy": [
+                0.6174424350994909,
+                -0.031870257370719794
+              ],
+              "end_xy": [
+                0.7975927938152708,
+                0.031318753296505526
+              ],
+              "static_traj_warn": false
+            },
+            {
+              "label": "replay_02",
+              "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/default/2026-10-03_02-19-03_486049_6d32edcb",
+              "traj_topic": "/pose",
+              "num_poses": 16,
+              "duration_sec": 58.40100000000001,
+              "path_length_m": 1.776831500270765,
+              "start_xy": [
+                0.6935227120395631,
+                0.04438276483013856
+              ],
+              "end_xy": [
+                0.790193533401377,
+                0.042036051758246956
+              ],
+              "static_traj_warn": false
+            },
+            {
+              "label": "replay_03",
+              "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/default/2026-10-03_02-20-15_722187_9e14c246",
+              "traj_topic": "/pose",
+              "num_poses": 15,
+              "duration_sec": 58.200000000000045,
+              "path_length_m": 1.6791584691329668,
+              "start_xy": [
+                0.6694745959651741,
+                0.05612382905604708
+              ],
+              "end_xy": [
+                0.7789656122906697,
+                0.0390102170966226
+              ],
+              "static_traj_warn": false
+            },
+            {
+              "label": "replay_04",
+              "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/default/2026-10-03_02-21-27_262159_c438fe10",
+              "traj_topic": "/pose",
+              "num_poses": 16,
+              "duration_sec": 59.202,
+              "path_length_m": 1.7412374339770205,
+              "start_xy": [
+                0.6952455950491654,
+                0.05415526699689492
+              ],
+              "end_xy": [
+                0.7667925538666203,
+                0.04442098076553536
+              ],
+              "static_traj_warn": false
+            },
+            {
+              "label": "replay_05",
+              "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/default/2026-10-03_02-22-39_239775_172112ab",
+              "traj_topic": "/pose",
+              "num_poses": 15,
+              "duration_sec": 59.09999999999991,
+              "path_length_m": 1.7268635672392683,
+              "start_xy": [
+                0.6846137375345652,
+                0.0719010872300304
+              ],
+              "end_xy": [
+                0.6923062046176176,
+                0.04247135571594111
+              ],
+              "static_traj_warn": false
+            }
+          ],
+          "pairwise_rmse_m": [
+            [
+              0.0,
+              0.38414787667286493,
+              0.39545475633542926,
+              0.3787393395221477,
+              0.3894922897950502,
+              0.42613845691082053
+            ],
+            [
+              0.38414787667286493,
+              0.0,
+              0.4316574499152306,
+              0.4236341421121063,
+              0.4310912414235523,
+              0.4486753228742987
+            ],
+            [
+              0.39545475633542926,
+              0.4316574499152306,
+              0.0,
+              0.024190236578571677,
+              0.014186819996503092,
+              0.05036717614861816
+            ],
+            [
+              0.3787393395221477,
+              0.4236341421121063,
+              0.024190236578571677,
+              0.0,
+              0.023343205170118602,
+              0.06773389231620215
+            ],
+            [
+              0.3894922897950502,
+              0.4310912414235523,
+              0.014186819996503092,
+              0.023343205170118602,
+              0.0,
+              0.055774565541143115
+            ],
+            [
+              0.42613845691082053,
+              0.4486753228742987,
+              0.05036717614861816,
+              0.06773389231620215,
+              0.055774565541143115,
+              0.0
+            ]
+          ],
+          "vs_reference": [
+            {
+              "label": "baseline",
+              "final_endpoint_error_m": 0.0,
+              "duration_sec": 3.701999999999998,
+              "duration_ratio_vs_ref": 1.0,
+              "rmse_vs_ref_m": 0.0,
+              "mean_pointwise_distance_vs_ref_m": 0.0
+            },
+            {
+              "label": "replay_01",
+              "final_endpoint_error_m": 0.07451471557125619,
+              "duration_sec": 58.101,
+              "duration_ratio_vs_ref": 15.694489465153978,
+              "rmse_vs_ref_m": 0.38414787667286493,
+              "mean_pointwise_distance_vs_ref_m": 0.37101632933075257
+            },
+            {
+              "label": "replay_02",
+              "final_endpoint_error_m": 0.07403753046759885,
+              "duration_sec": 58.40100000000001,
+              "duration_ratio_vs_ref": 15.77552674230147,
+              "rmse_vs_ref_m": 0.39545475633542926,
+              "mean_pointwise_distance_vs_ref_m": 0.3851704654574191
+            },
+            {
+              "label": "replay_03",
+              "final_endpoint_error_m": 0.06344802653387155,
+              "duration_sec": 58.200000000000045,
+              "duration_ratio_vs_ref": 15.721231766612663,
+              "rmse_vs_ref_m": 0.3787393395221477,
+              "mean_pointwise_distance_vs_ref_m": 0.36830851383313123
+            },
+            {
+              "label": "replay_04",
+              "final_endpoint_error_m": 0.05918707204271643,
+              "duration_sec": 59.202,
+              "duration_ratio_vs_ref": 15.991896272285258,
+              "rmse_vs_ref_m": 0.3894922897950502,
+              "mean_pointwise_distance_vs_ref_m": 0.37980480589307625
+            },
+            {
+              "label": "replay_05",
+              "final_endpoint_error_m": 0.06010123811815588,
+              "duration_sec": 59.09999999999991,
+              "duration_ratio_vs_ref": 15.96434359805509,
+              "rmse_vs_ref_m": 0.42613845691082053,
+              "mean_pointwise_distance_vs_ref_m": 0.41863251845599875
+            }
+          ],
+          "labels": [
+            "baseline",
+            "replay_01",
+            "replay_02",
+            "replay_03",
+            "replay_04",
+            "replay_05"
+          ],
+          "resampling": {
+            "mode": "time",
+            "samples": 100,
+            "time_grid": "normalised_0_1"
+          }
+        },
+        "analysis_log": "Lendo baseline ... (collections/default/2026-10-03_02-17-36_192696_b997c008)\nLendo replay_01 ... (collections/default/2026-10-03_02-17-52_972554_233a10c2)\nLendo replay_02 ... (collections/default/2026-10-03_02-19-03_486049_6d32edcb)\nLendo replay_03 ... (collections/default/2026-10-03_02-20-15_722187_9e14c246)\nLendo replay_04 ... (collections/default/2026-10-03_02-21-27_262159_c438fe10)\nLendo replay_05 ... (collections/default/2026-10-03_02-22-39_239775_172112ab)\n[OK] CSVs: /home/eduardo/fleet-ui/fleet_ws/runs/llm_pilot01_4979c065/analysis/trajectories_csv/\n\n[OK] Resumo: /home/eduardo/fleet-ui/fleet_ws/runs/llm_pilot01_4979c065/analysis/summary.json\n[OK] Gráfico: /home/eduardo/fleet-ui/fleet_ws/runs/llm_pilot01_4979c065/analysis/trajectory_overlay.png\n\n--- Métricas por run ---\n  baseline: duração=3.70s  comprimento=0.686m  poses=6  topic=/pose\n  replay_01: duração=58.10s  comprimento=1.692m  poses=15  topic=/pose\n  replay_02: duração=58.40s  comprimento=1.777m  poses=16  topic=/pose\n  replay_03: duração=58.20s  comprimento=1.679m  poses=15  topic=/pose\n  replay_04: duração=59.20s  comprimento=1.741m  poses=16  topic=/pose\n  replay_05: duração=59.10s  comprimento=1.727m  poses=15  topic=/pose\n\n--- RMSE (m) entre pares (time) ---\n  baseline vs replay_01: 0.3841 m\n  baseline vs replay_02: 0.3955 m\n  baseline vs replay_03: 0.3787 m\n  baseline vs replay_04: 0.3895 m\n  baseline vs replay_05: 0.4261 m\n  replay_01 vs replay_02: 0.4317 m\n  replay_01 vs replay_03: 0.4236 m\n  replay_01 vs replay_04: 0.4311 m\n  replay_01 vs replay_05: 0.4487 m\n  replay_02 vs replay_03: 0.0242 m\n  replay_02 vs replay_04: 0.0142 m\n  replay_02 vs replay_05: 0.0504 m\n  replay_03 vs replay_04: 0.0233 m\n  replay_03 vs replay_05: 0.0677 m\n  replay_04 vs replay_05: 0.0558 m\n\n--- Vs referência (baseline) ---\n  baseline: RMSE=0.0000 m  dist_média_pt=0.0000 m  Δfim=0.0000 m  duração×=1.000\n  replay_01: RMSE=0.3841 m  dist_média_pt=0.3710 m  Δfim=0.0745 m  duração×=15.694\n  replay_02: RMSE=0.3955 m  dist_média_pt=0.3852 m  Δfim=0.0740 m  duração×=15.776\n  replay_03: RMSE=0.3787 m  dist_média_pt=0.3683 m  Δfim=0.0634 m  duração×=15.721\n  replay_04: RMSE=0.3895 m  dist_média_pt=0.3798 m  Δfim=0.0592 m  duração×=15.992\n  replay_05: RMSE=0.4261 m  dist_média_pt=0.4186 m  Δfim=0.0601 m  duração×=15.964\n",
+        "error": null,
+        "run_id": "llm_pilot01_4979c065"
+      }
+    },
+    {
+      "tool_name": "analyze_experiment",
+      "tool_input": {
+        "run_id": "llm_pilot01_4979c065"
+      },
+      "result": {
+        "run_id": "llm_pilot01_4979c065",
+        "reference_label": "baseline",
+        "num_runs": 6,
+        "mean_rmse_vs_ref_m": 0.39479454384726254,
+        "max_rmse_vs_ref_m": 0.42613845691082053,
+        "rmse_threshold_m": 0.05,
+        "flagged_runs": [
+          {
+            "label": "replay_01",
+            "final_endpoint_error_m": 0.07451471557125619,
+            "duration_sec": 58.101,
+            "duration_ratio_vs_ref": 15.694489465153978,
+            "rmse_vs_ref_m": 0.38414787667286493,
+            "mean_pointwise_distance_vs_ref_m": 0.37101632933075257
+          },
+          {
+            "label": "replay_02",
+            "final_endpoint_error_m": 0.07403753046759885,
+            "duration_sec": 58.40100000000001,
+            "duration_ratio_vs_ref": 15.77552674230147,
+            "rmse_vs_ref_m": 0.39545475633542926,
+            "mean_pointwise_distance_vs_ref_m": 0.3851704654574191
+          },
+          {
+            "label": "replay_03",
+            "final_endpoint_error_m": 0.06344802653387155,
+            "duration_sec": 58.200000000000045,
+            "duration_ratio_vs_ref": 15.721231766612663,
+            "rmse_vs_ref_m": 0.3787393395221477,
+            "mean_pointwise_distance_vs_ref_m": 0.36830851383313123
+          },
+          {
+            "label": "replay_04",
+            "final_endpoint_error_m": 0.05918707204271643,
+            "duration_sec": 59.202,
+            "duration_ratio_vs_ref": 15.991896272285258,
+            "rmse_vs_ref_m": 0.3894922897950502,
+            "mean_pointwise_distance_vs_ref_m": 0.37980480589307625
+          },
+          {
+            "label": "replay_05",
+            "final_endpoint_error_m": 0.06010123811815588,
+            "duration_sec": 59.09999999999991,
+            "duration_ratio_vs_ref": 15.96434359805509,
+            "rmse_vs_ref_m": 0.42613845691082053,
+            "mean_pointwise_distance_vs_ref_m": 0.41863251845599875
+          }
+        ]
+      }
+    }
+  ],
+  "final_text": "A campanha `llm_pilot01_4979c065` terminou sem falhas, mas o baseline não é comparável aos replays. Os 5 replays ficaram entre si dentro de uns poucos centímetros, enquanto todos divergem do baseline em cerca de 0,4 m.\n\nGravei a rota nova `llm_pilot01` (10 poses em `routes/default/llm_pilot01.yaml`). Não mexi em `dissertation_clean01` nem nas outras rotas. O robô `\"\"` estava ocioso e com pose válida antes de começar.\n\n**RMSE contra o baseline (limiar de 0,05 m):**\n\n| Execução | RMSE (m) | Erro no ponto final (m) | Duração (s) |\n|---|---|---|---|\n| replay_01 | 0,384 | 0,075 | 58,1 |\n| replay_02 | 0,395 | 0,074 | 58,4 |\n| replay_03 | 0,379 | 0,063 | 58,2 |\n| replay_04 | 0,389 | 0,059 | 59,2 |\n| replay_05 | 0,426 | 0,060 | 59,1 |\n\nO RMSE médio contra o baseline foi 0,395 m e o máximo 0,426 m (replay_05). Os 5 replays ficaram acima do limiar.\n\n**RMSE entre os replays:**\n- Entre replay_02, 03, 04 e 05, o RMSE ficou entre 0,014 e 0,068 m, ou seja, a repetibilidade é boa.\n- O replay_05 é o mais distante dos outros replays: 0,050 a 0,068 m contra 02, 03 e 04.\n- O replay_01 diverge dos demais replays em 0,42 a 0,45 m, quase o mesmo que diverge do baseline.\n\n**Por que o RMSE contra o baseline é alto:** isso parece vir da forma como a comparação foi feita, mais do que de erro de repetibilidade do robô. Não rodei `diagnose_experiment`, então é uma leitura dos números e não uma causa confirmada.\n- **Duração:** o baseline durou 3,7 s e cada replay cerca de 58 s, uns 16 vezes mais.\n- **Poses:** a trajetória do baseline usa só 6 poses de `/pose`, contra 15 ou 16 nos replays.\n- **Ponto de partida:** o baseline começou perto de (0,05, −0,01) e os replays começaram entre x = 0,62 e 0,70, o que sugere que a janela de `/pose` não cobre o mesmo trecho.\n- **Comprimento:** o baseline mede 0,69 m e os replays 1,68 a 1,78 m.\n- **Odometria:** nos replays a odometria registrou 2,05 a 2,16 m para uma rota teórica de 1 m, contra 0,83 m na gravação.\n- **Reamostragem:** a análise reamostra no tempo normalizado de 0 a 1, o que agrava a diferença de duração.\n\nSe quiser, rodo `diagnose_experiment` nesse run_id para ver a hipótese de causa por execução.",
+  "error": null,
+  "instruction": "Use run_campaign com robot=\"\" (string vazia), route=\"llm_pilot01\" (rota NOVA, nao mexa em dissertation_clean01 nem em outras rotas existentes), points=[[0.5,0,0],[1.0,0,0]], repetitions=5, collect=true, topics=[\"odom\",\"pose\",\"scan\",\"imu\"]. Isso grava 1 baseline curta reta de ~1m e reproduz 5 vezes. Depois use analyze_experiment pra me dar o RMSE entre as execucoes.",
+  "model": "claude-sonnet-5-5",
+  "started_at": "2026-10-03T02:17:23.787173+00:00",
+  "finished_at": "2026-10-03T02:24:02.289085+00:00"
+}

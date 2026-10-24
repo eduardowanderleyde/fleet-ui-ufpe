@@ -1,0 +1,1222 @@
+{
+  "kind": "fleet",
+  "job_id": "496027be",
+  "running": false,
+  "robots": {
+    "tb1": {
+      "running": false,
+      "steps": [
+        {
+          "tool_name": "get_robot_status",
+          "tool_input": {
+            "robot_id": "tb1"
+          },
+          "result": {
+            "robot_id": "tb1",
+            "role": "MUUT",
+            "nav_state": "idle",
+            "current_route": "",
+            "collection_on": false,
+            "collection_file": "",
+            "last_error": "",
+            "bytes_written": 0,
+            "pose": {
+              "x": 6.911075480341194e-12,
+              "y": -7.122073366576887e-27,
+              "yaw": -1.9784038883497894e-15,
+              "valid": true
+            }
+          }
+        },
+        {
+          "tool_name": "list_routes",
+          "tool_input": {
+            "robot_id": "tb1"
+          },
+          "result": [
+            "fleet_pilot_tb1",
+            "fleet_pilot_tb1_v2"
+          ]
+        },
+        {
+          "tool_name": "run_campaign",
+          "tool_input": {
+            "robot": "tb1",
+            "route": "fleet_pilot_tb1_v3",
+            "points": [
+              [
+                0.5,
+                0,
+                0
+              ],
+              [
+                1.0,
+                0,
+                0
+              ]
+            ],
+            "repetitions": 3,
+            "collect": true,
+            "topics": [
+              "odom",
+              "pose"
+            ]
+          },
+          "result": {
+            "running": false,
+            "steps": [
+              {
+                "label": "baseline",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py record --route fleet_pilot_tb1_v3 --robot tb1 --topics odom pose --points=0.5,0.0,0.0;1.0,0.0,0.0 --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_baseline.json",
+                  "",
+                  "=== Fase A: gravar percurso (coleta + record + waypoints) ===",
+                  "robot='tb1' route=fleet_pilot_tb1_v3 pontos=2",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_baseline.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb1/2026-10-03_17-31-20_853366_7c45d015",
+                  "[TRACE] Chamando service start_record ...",
+                  "[OK] start_record — Recording started",
+                  "[TRACE] Esperando TF map->base_link ...",
+                  "[FALHOU] TF map->base_link disponível",
+                  "[TRACE] Aguardando /map (SLAM) ou settle do costmap (AMCL) ...",
+                  "[INFO] /map não publicado — modo AMCL com mapa pré-carregado (normal)",
+                  "[TRACE] Aguardando costmap processar mapa (3s) ...",
+                  "[TRACE] go_to_point wp1: x=0.500 y=0.000 yaw=0.000",
+                  "[OK] go_to_point wp1 (0.50, 0.00, yaw=0.00) — Navigation started",
+                  "[OK] wp1 estado navigating",
+                  "[OK] wp1 concluído (recording)",
+                  "[TRACE] go_to_point wp2: x=1.000 y=0.000 yaw=0.000",
+                  "[OK] go_to_point wp2 (1.00, 0.00, yaw=0.00) — Navigation started",
+                  "[OK] wp2 estado navigating",
+                  "[OK] wp2 concluído (recording)",
+                  "[TRACE] Chamando service stop_record ...",
+                  "[OK] stop_record — Saved 10 poses to routes/tb1/fleet_pilot_tb1_v3.yaml",
+                  "[OK] disable_collection — Collection disabled for tb1. Bag: collections/tb1/2026-10-03_17-31-20_853366_7c45d015",
+                  "",
+                  "Resumo: sem falhas",
+                  "[TRACE] Duração real (parede): 39.36 s  Percurso teórico: 1.0 m",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb1/pose: 7 msgs  ~0.2 Hz",
+                  "  /tb1/odom: 1082 msgs  ~27.8 Hz",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_baseline.json"
+                ],
+                "result": {
+                  "command": "record",
+                  "robot_id": "tb1",
+                  "route": "fleet_pilot_tb1_v3",
+                  "expected_route_yaml": "routes/tb1/fleet_pilot_tb1_v3.yaml",
+                  "points": [
+                    [
+                      0.5,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      1.0,
+                      0.0,
+                      0.0
+                    ]
+                  ],
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": true,
+                  "failures_reported": 0,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb1. Bag: collections/tb1/2026-10-03_17-31-20_853366_7c45d015",
+                  "rosbag_path": "collections/tb1/2026-10-03_17-31-20_853366_7c45d015",
+                  "sensor_summary": {
+                    "/tb1/pose": {
+                      "msgs": 7,
+                      "hz_est": 0.2
+                    },
+                    "/tb1/odom": {
+                      "msgs": 1082,
+                      "hz_est": 27.8
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 38.92,
+                    "wall_duration_s": 39.36,
+                    "theoretical_path_m": 1.0
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "record",
+                      "--route",
+                      "fleet_pilot_tb1_v3",
+                      "--robot",
+                      "tb1",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--points=0.5,0.0,0.0;1.0,0.0,0.0",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_baseline.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T17:31:59.976208+00:00",
+                  "git": {
+                    "commit": "797580c46a46303788d25a11e899115d63faba92",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 0
+              },
+              {
+                "label": "replay_01",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route fleet_pilot_tb1_v3 --robot tb1 --topics odom pose --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_01.json",
+                  "",
+                  "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+                  "robot='tb1' route=fleet_pilot_tb1_v3",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_01.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb1/2026-10-03_17-32-01_274819_25039b89",
+                  "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+                  "[TRACE] Chamando service play_route ...",
+                  "[OK] play_route — Navigation started",
+                  "[OK] navegação iniciou (navigating)",
+                  "[OK] navegação terminou (idle)",
+                  "[TRACE] Chamando service disable_collection ...",
+                  "[OK] disable_collection — Collection disabled for tb1. Bag: collections/tb1/2026-10-03_17-32-01_274819_25039b89",
+                  "",
+                  "Resumo: sem falhas",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb1/pose: 9 msgs  ~0.4 Hz",
+                  "  /tb1/odom: 603 msgs  ~27.8 Hz",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_01.json"
+                ],
+                "result": {
+                  "command": "replay",
+                  "robot_id": "tb1",
+                  "route": "fleet_pilot_tb1_v3",
+                  "expected_route_yaml": "routes/tb1/fleet_pilot_tb1_v3.yaml",
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": true,
+                  "failures_reported": 0,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb1. Bag: collections/tb1/2026-10-03_17-32-01_274819_25039b89",
+                  "rosbag_path": "collections/tb1/2026-10-03_17-32-01_274819_25039b89",
+                  "sensor_summary": {
+                    "/tb1/pose": {
+                      "msgs": 9,
+                      "hz_est": 0.4
+                    },
+                    "/tb1/odom": {
+                      "msgs": 603,
+                      "hz_est": 27.8
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 21.67
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "replay",
+                      "--route",
+                      "fleet_pilot_tb1_v3",
+                      "--robot",
+                      "tb1",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_01.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T17:32:23.090732+00:00",
+                  "git": {
+                    "commit": "797580c46a46303788d25a11e899115d63faba92",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 0
+              },
+              {
+                "label": "replay_02",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route fleet_pilot_tb1_v3 --robot tb1 --topics odom pose --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_02.json",
+                  "",
+                  "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+                  "robot='tb1' route=fleet_pilot_tb1_v3",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_02.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb1/2026-10-03_17-32-26_144768_636ea90c",
+                  "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+                  "[TRACE] Chamando service play_route ...",
+                  "[OK] play_route — Navigation started",
+                  "[OK] navegação iniciou (navigating)",
+                  "[OK] navegação terminou (idle)",
+                  "[TRACE] Chamando service disable_collection ...",
+                  "[OK] disable_collection — Collection disabled for tb1. Bag: collections/tb1/2026-10-03_17-32-26_144768_636ea90c",
+                  "",
+                  "Resumo: sem falhas",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb1/pose: 10 msgs  ~0.4 Hz",
+                  "  /tb1/odom: 776 msgs  ~27.8 Hz",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_02.json"
+                ],
+                "result": {
+                  "command": "replay",
+                  "robot_id": "tb1",
+                  "route": "fleet_pilot_tb1_v3",
+                  "expected_route_yaml": "routes/tb1/fleet_pilot_tb1_v3.yaml",
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": true,
+                  "failures_reported": 0,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb1. Bag: collections/tb1/2026-10-03_17-32-26_144768_636ea90c",
+                  "rosbag_path": "collections/tb1/2026-10-03_17-32-26_144768_636ea90c",
+                  "sensor_summary": {
+                    "/tb1/pose": {
+                      "msgs": 10,
+                      "hz_est": 0.4
+                    },
+                    "/tb1/odom": {
+                      "msgs": 776,
+                      "hz_est": 27.8
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 27.9
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "replay",
+                      "--route",
+                      "fleet_pilot_tb1_v3",
+                      "--robot",
+                      "tb1",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_02.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T17:32:54.254003+00:00",
+                  "git": {
+                    "commit": "797580c46a46303788d25a11e899115d63faba92",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 0
+              },
+              {
+                "label": "replay_03",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route fleet_pilot_tb1_v3 --robot tb1 --topics odom pose --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_03.json",
+                  "",
+                  "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+                  "robot='tb1' route=fleet_pilot_tb1_v3",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_03.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb1/2026-10-03_17-32-56_118052_06aefb00",
+                  "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+                  "[TRACE] Chamando service play_route ...",
+                  "[OK] play_route — Navigation started",
+                  "[OK] navegação iniciou (navigating)",
+                  "[OK] navegação terminou (idle)",
+                  "[TRACE] Chamando service disable_collection ...",
+                  "[OK] disable_collection — Collection disabled for tb1. Bag: collections/tb1/2026-10-03_17-32-56_118052_06aefb00",
+                  "",
+                  "Resumo: sem falhas",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb1/pose: 5 msgs  ~0.3 Hz",
+                  "  /tb1/odom: 553 msgs  ~27.8 Hz",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_03.json"
+                ],
+                "result": {
+                  "command": "replay",
+                  "robot_id": "tb1",
+                  "route": "fleet_pilot_tb1_v3",
+                  "expected_route_yaml": "routes/tb1/fleet_pilot_tb1_v3.yaml",
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": true,
+                  "failures_reported": 0,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb1. Bag: collections/tb1/2026-10-03_17-32-56_118052_06aefb00",
+                  "rosbag_path": "collections/tb1/2026-10-03_17-32-56_118052_06aefb00",
+                  "sensor_summary": {
+                    "/tb1/pose": {
+                      "msgs": 5,
+                      "hz_est": 0.3
+                    },
+                    "/tb1/odom": {
+                      "msgs": 553,
+                      "hz_est": 27.8
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 19.87
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "replay",
+                      "--route",
+                      "fleet_pilot_tb1_v3",
+                      "--robot",
+                      "tb1",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_v3_2a9eaf09_replay_03.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T17:33:16.074777+00:00",
+                  "git": {
+                    "commit": "797580c46a46303788d25a11e899115d63faba92",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 0
+              }
+            ],
+            "summary": {
+              "generated_at": "2026-10-03T17:33:17.154464+00:00",
+              "reference_run_index": 0,
+              "reference_label": "baseline",
+              "runs": [
+                {
+                  "label": "baseline",
+                  "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/tb1/2026-10-03_17-31-20_853366_7c45d015",
+                  "traj_topic": "/tb1/pose",
+                  "num_poses": 7,
+                  "duration_sec": 3.801000000000002,
+                  "path_length_m": 0.7775809630062164,
+                  "start_xy": [
+                    0.04010669754124945,
+                    0.00012970434191230916
+                  ],
+                  "end_xy": [
+                    0.8163784357522149,
+                    0.0006647941326100823
+                  ],
+                  "static_traj_warn": false
+                },
+                {
+                  "label": "replay_01",
+                  "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/tb1/2026-10-03_17-32-01_274819_25039b89",
+                  "traj_topic": "/tb1/pose",
+                  "num_poses": 9,
+                  "duration_sec": 11.600999999999999,
+                  "path_length_m": 1.0216831697336282,
+                  "start_xy": [
+                    0.7351207215278114,
+                    -0.005966398913195525
+                  ],
+                  "end_xy": [
+                    0.8378580681232501,
+                    -0.1406482502652394
+                  ],
+                  "static_traj_warn": false
+                },
+                {
+                  "label": "replay_02",
+                  "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/tb1/2026-10-03_17-32-26_144768_636ea90c",
+                  "traj_topic": "/tb1/pose",
+                  "num_poses": 10,
+                  "duration_sec": 19.40100000000001,
+                  "path_length_m": 1.0586391593495625,
+                  "start_xy": [
+                    0.745066125978228,
+                    -0.15962176971684497
+                  ],
+                  "end_xy": [
+                    0.7237137797234804,
+                    0.059629818345295064
+                  ],
+                  "static_traj_warn": false
+                },
+                {
+                  "label": "replay_03",
+                  "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/tb1/2026-10-03_17-32-56_118052_06aefb00",
+                  "traj_topic": "/tb1/pose",
+                  "num_poses": 5,
+                  "duration_sec": 8.001000000000005,
+                  "path_length_m": 0.5467588438490584,
+                  "start_xy": [
+                    0.6278243262370305,
+                    0.08038071031719266
+                  ],
+                  "end_xy": [
+                    0.4832740594143219,
+                    0.1671855699029229
+                  ],
+                  "static_traj_warn": false
+                }
+              ],
+              "pairwise_rmse_m": [
+                [
+                  0.0,
+                  0.2594113563422418,
+                  0.26406786177250585,
+                  0.2691922055353471
+                ],
+                [
+                  0.2594113563422418,
+                  0.0,
+                  0.1768872629475213,
+                  0.33695781011766
+                ],
+                [
+                  0.26406786177250585,
+                  0.1768872629475213,
+                  0.0,
+                  0.2605577067263368
+                ],
+                [
+                  0.2691922055353471,
+                  0.33695781011766,
+                  0.2605577067263368,
+                  0.0
+                ]
+              ],
+              "vs_reference": [
+                {
+                  "label": "baseline",
+                  "final_endpoint_error_m": 0.0,
+                  "duration_sec": 3.801000000000002,
+                  "duration_ratio_vs_ref": 1.0,
+                  "rmse_vs_ref_m": 0.0,
+                  "mean_pointwise_distance_vs_ref_m": 0.0
+                },
+                {
+                  "label": "replay_01",
+                  "final_endpoint_error_m": 0.14293617849859916,
+                  "duration_sec": 11.600999999999999,
+                  "duration_ratio_vs_ref": 3.052091554853984,
+                  "rmse_vs_ref_m": 0.2594113563422418,
+                  "mean_pointwise_distance_vs_ref_m": 0.23381849438980778
+                },
+                {
+                  "label": "replay_02",
+                  "final_endpoint_error_m": 0.10983447799906099,
+                  "duration_sec": 19.40100000000001,
+                  "duration_ratio_vs_ref": 5.1041831097079715,
+                  "rmse_vs_ref_m": 0.26406786177250585,
+                  "mean_pointwise_distance_vs_ref_m": 0.20885826256761267
+                },
+                {
+                  "label": "replay_03",
+                  "final_endpoint_error_m": 0.3724079675552115,
+                  "duration_sec": 8.001000000000005,
+                  "duration_ratio_vs_ref": 2.104972375690608,
+                  "rmse_vs_ref_m": 0.2691922055353471,
+                  "mean_pointwise_distance_vs_ref_m": 0.25054655705423234
+                }
+              ],
+              "labels": [
+                "baseline",
+                "replay_01",
+                "replay_02",
+                "replay_03"
+              ],
+              "resampling": {
+                "mode": "time",
+                "samples": 100,
+                "time_grid": "normalised_0_1"
+              }
+            },
+            "analysis_log": "Lendo baseline ... (collections/tb1/2026-10-03_17-31-20_853366_7c45d015)\nLendo replay_01 ... (collections/tb1/2026-10-03_17-32-01_274819_25039b89)\nLendo replay_02 ... (collections/tb1/2026-10-03_17-32-26_144768_636ea90c)\nLendo replay_03 ... (collections/tb1/2026-10-03_17-32-56_118052_06aefb00)\n[OK] CSVs: /home/eduardo/fleet-ui/fleet_ws/runs/fleet_pilot_tb1_v3_2a9eaf09/analysis/trajectories_csv/\n\n[OK] Resumo: /home/eduardo/fleet-ui/fleet_ws/runs/fleet_pilot_tb1_v3_2a9eaf09/analysis/summary.json\n[OK] Gráfico: /home/eduardo/fleet-ui/fleet_ws/runs/fleet_pilot_tb1_v3_2a9eaf09/analysis/trajectory_overlay.png\n\n--- Métricas por run ---\n  baseline: duração=3.80s  comprimento=0.778m  poses=7  topic=/tb1/pose\n  replay_01: duração=11.60s  comprimento=1.022m  poses=9  topic=/tb1/pose\n  replay_02: duração=19.40s  comprimento=1.059m  poses=10  topic=/tb1/pose\n  replay_03: duração=8.00s  comprimento=0.547m  poses=5  topic=/tb1/pose\n\n--- RMSE (m) entre pares (time) ---\n  baseline vs replay_01: 0.2594 m\n  baseline vs replay_02: 0.2641 m\n  baseline vs replay_03: 0.2692 m\n  replay_01 vs replay_02: 0.1769 m\n  replay_01 vs replay_03: 0.3370 m\n  replay_02 vs replay_03: 0.2606 m\n\n--- Vs referência (baseline) ---\n  baseline: RMSE=0.0000 m  dist_média_pt=0.0000 m  Δfim=0.0000 m  duração×=1.000\n  replay_01: RMSE=0.2594 m  dist_média_pt=0.2338 m  Δfim=0.1429 m  duração×=3.052\n  replay_02: RMSE=0.2641 m  dist_média_pt=0.2089 m  Δfim=0.1098 m  duração×=5.104\n  replay_03: RMSE=0.2692 m  dist_média_pt=0.2505 m  Δfim=0.3724 m  duração×=2.105\n",
+            "error": null,
+            "run_id": "fleet_pilot_tb1_v3_2a9eaf09"
+          }
+        },
+        {
+          "tool_name": "analyze_experiment",
+          "tool_input": {
+            "run_id": "fleet_pilot_tb1_v3_2a9eaf09"
+          },
+          "result": {
+            "run_id": "fleet_pilot_tb1_v3_2a9eaf09",
+            "reference_label": "baseline",
+            "num_runs": 4,
+            "mean_rmse_vs_ref_m": 0.2642238078833649,
+            "max_rmse_vs_ref_m": 0.2691922055353471,
+            "rmse_threshold_m": 0.05,
+            "flagged_runs": [
+              {
+                "label": "replay_01",
+                "final_endpoint_error_m": 0.14293617849859916,
+                "duration_sec": 11.600999999999999,
+                "duration_ratio_vs_ref": 3.052091554853984,
+                "rmse_vs_ref_m": 0.2594113563422418,
+                "mean_pointwise_distance_vs_ref_m": 0.23381849438980778
+              },
+              {
+                "label": "replay_02",
+                "final_endpoint_error_m": 0.10983447799906099,
+                "duration_sec": 19.40100000000001,
+                "duration_ratio_vs_ref": 5.1041831097079715,
+                "rmse_vs_ref_m": 0.26406786177250585,
+                "mean_pointwise_distance_vs_ref_m": 0.20885826256761267
+              },
+              {
+                "label": "replay_03",
+                "final_endpoint_error_m": 0.3724079675552115,
+                "duration_sec": 8.001000000000005,
+                "duration_ratio_vs_ref": 2.104972375690608,
+                "rmse_vs_ref_m": 0.2691922055353471,
+                "mean_pointwise_distance_vs_ref_m": 0.25054655705423234
+              }
+            ]
+          }
+        }
+      ],
+      "final_text": "A campanha `fleet_pilot_tb1_v3_2a9eaf09` terminou sem falhas de execução, mas as três repetições ficaram bem acima do limiar de RMSE de 0,05 m.\n\n**Execução**\n- O tb1 estava ocioso e com pose válida antes de começar.\n- A rota `fleet_pilot_tb1_v3` não existia antes, então era nova de fato.\n- A gravação do baseline salvou 10 poses em `routes/tb1/fleet_pilot_tb1_v3.yaml`, e as 3 repetições rodaram com `collect=true` e os tópicos `odom` e `pose`.\n\n**RMSE em relação ao baseline** (limiar 0,05 m)\n\n| Execução | RMSE (m) | Erro no ponto final (m) | Duração (s) | Duração vs. baseline |\n|---|---|---|---|---|\n| replay_01 | 0,259 | 0,143 | 11,6 | 3,05× |\n| replay_02 | 0,264 | 0,110 | 19,4 | 5,10× |\n| replay_03 | 0,269 | 0,372 | 8,0 | 2,10× |\n\n- O RMSE médio foi 0,264 m e o máximo 0,269 m, cerca de 5 vezes o limiar.\n- O RMSE entre as repetições também é alto, de 0,177 a 0,337 m. Elas diferem entre si, não só em relação ao baseline.\n\n**Possíveis causas**\n- **Pose de partida diferente:** o baseline começou perto de (0,04, 0) e terminou em (0,82, 0). Os replays começaram em x ≈ 0,63–0,75, ou seja, não partiram da origem. O RMSE alto pode vir em boa parte disso.\n- **Poucas amostras de pose:** `/tb1/pose` publica a cerca de 0,2–0,4 Hz, o que dá só 5 a 10 poses por execução. Isso deixa a comparação grosseira.\n- **Replay_03 incompleto:** o percurso foi de 0,55 m, contra 1,02 m e 1,06 m nos outros dois. Esse replay terminou a 0,37 m do ponto final do baseline.\n- **Baseline curto:** o comprimento medido foi 0,78 m, para um percurso teórico de 1,0 m.\n- **Aviso no log da gravação:** \"TF map->base_link disponível\" falhou, e o log seguiu em modo AMCL com mapa pré-carregado. Vale checar a localização.\n\nPosso rodar `diagnose_experiment` neste run para ver as hipóteses por execução. Também posso repetir a campanha depois de reposicionar o tb1 na origem.",
+      "error": null,
+      "instruction": "Use run_campaign com robot=\"tb1\", route=\"fleet_pilot_tb1_v3\" (rota NOVA), points=[[0.5,0,0],[1.0,0,0]], repetitions=3, collect=true, topics=[\"odom\",\"pose\"]. Depois use analyze_experiment pra me dar o RMSE."
+    },
+    "tb2": {
+      "running": false,
+      "steps": [
+        {
+          "tool_name": "get_robot_status",
+          "tool_input": {
+            "robot_id": "tb2"
+          },
+          "result": {
+            "robot_id": "tb2",
+            "role": "MUUT",
+            "nav_state": "idle",
+            "current_route": "",
+            "collection_on": false,
+            "collection_file": "",
+            "last_error": "",
+            "bytes_written": 0,
+            "pose": {
+              "x": 6.911075480341194e-12,
+              "y": -7.122073366576887e-27,
+              "yaw": -1.9784038883497894e-15,
+              "valid": true
+            }
+          }
+        },
+        {
+          "tool_name": "list_routes",
+          "tool_input": {
+            "robot_id": "tb2"
+          },
+          "result": [
+            "fleet_pilot_tb2",
+            "fleet_pilot_tb2_v2"
+          ]
+        },
+        {
+          "tool_name": "run_campaign",
+          "tool_input": {
+            "robot": "tb2",
+            "route": "fleet_pilot_tb2_v3",
+            "points": [
+              [
+                0.5,
+                2,
+                0
+              ],
+              [
+                1.0,
+                2,
+                0
+              ]
+            ],
+            "repetitions": 3,
+            "collect": true,
+            "topics": [
+              "odom",
+              "pose"
+            ]
+          },
+          "result": {
+            "running": false,
+            "steps": [
+              {
+                "label": "baseline",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py record --route fleet_pilot_tb2_v3 --robot tb2 --topics odom pose --points=0.5,2.0,0.0;1.0,2.0,0.0 --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_baseline.json",
+                  "",
+                  "=== Fase A: gravar percurso (coleta + record + waypoints) ===",
+                  "robot='tb2' route=fleet_pilot_tb2_v3 pontos=2",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_baseline.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb2/2026-10-03_17-31-20_029603_2e2c2bbe",
+                  "[TRACE] Chamando service start_record ...",
+                  "[OK] start_record — Recording started",
+                  "[TRACE] Esperando TF map->base_link ...",
+                  "[FALHOU] TF map->base_link disponível",
+                  "[TRACE] Aguardando /map (SLAM) ou settle do costmap (AMCL) ...",
+                  "[INFO] /map não publicado — modo AMCL com mapa pré-carregado (normal)",
+                  "[TRACE] Aguardando costmap processar mapa (3s) ...",
+                  "[TRACE] go_to_point wp1: x=0.500 y=2.000 yaw=0.000",
+                  "[OK] go_to_point wp1 (0.50, 2.00, yaw=0.00) — Navigation started",
+                  "[OK] wp1 estado navigating",
+                  "[OK] wp1 concluído (recording)",
+                  "[TRACE] go_to_point wp2: x=1.000 y=2.000 yaw=0.000",
+                  "[OK] go_to_point wp2 (1.00, 2.00, yaw=0.00) — Navigation started",
+                  "[OK] wp2 estado navigating",
+                  "[OK] wp2 concluído (recording)",
+                  "[TRACE] Chamando service stop_record ...",
+                  "[OK] stop_record — Saved 11 poses to routes/tb2/fleet_pilot_tb2_v3.yaml",
+                  "[OK] disable_collection — Collection disabled for tb2. Bag: collections/tb2/2026-10-03_17-31-20_029603_2e2c2bbe",
+                  "",
+                  "Resumo: sem falhas",
+                  "[TRACE] Duração real (parede): 41.92 s  Percurso teórico: 2.562 m",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb2/pose: 3 msgs  ~0.1 Hz",
+                  "  /tb2/odom: 1104 msgs  ~27.8 Hz",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_baseline.json"
+                ],
+                "result": {
+                  "command": "record",
+                  "robot_id": "tb2",
+                  "route": "fleet_pilot_tb2_v3",
+                  "expected_route_yaml": "routes/tb2/fleet_pilot_tb2_v3.yaml",
+                  "points": [
+                    [
+                      0.5,
+                      2.0,
+                      0.0
+                    ],
+                    [
+                      1.0,
+                      2.0,
+                      0.0
+                    ]
+                  ],
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": true,
+                  "failures_reported": 0,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb2. Bag: collections/tb2/2026-10-03_17-31-20_029603_2e2c2bbe",
+                  "rosbag_path": "collections/tb2/2026-10-03_17-31-20_029603_2e2c2bbe",
+                  "sensor_summary": {
+                    "/tb2/pose": {
+                      "msgs": 3,
+                      "hz_est": 0.1
+                    },
+                    "/tb2/odom": {
+                      "msgs": 1104,
+                      "hz_est": 27.8
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 39.71,
+                    "wall_duration_s": 41.92,
+                    "theoretical_path_m": 2.562
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "record",
+                      "--route",
+                      "fleet_pilot_tb2_v3",
+                      "--robot",
+                      "tb2",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--points=0.5,2.0,0.0;1.0,2.0,0.0",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_baseline.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T17:31:59.969928+00:00",
+                  "git": {
+                    "commit": "797580c46a46303788d25a11e899115d63faba92",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 0
+              },
+              {
+                "label": "replay_01",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route fleet_pilot_tb2_v3 --robot tb2 --topics odom pose --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_01.json",
+                  "",
+                  "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+                  "robot='tb2' route=fleet_pilot_tb2_v3",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_01.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb2/2026-10-03_17-32-01_261747_48f48ae5",
+                  "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+                  "[TRACE] Chamando service play_route ...",
+                  "[OK] play_route — Navigation started",
+                  "[OK] navegação iniciou (navigating)",
+                  "[OK] navegação terminou (idle)",
+                  "[TRACE] Chamando service disable_collection ...",
+                  "[OK] disable_collection — Collection disabled for tb2. Bag: collections/tb2/2026-10-03_17-32-01_261747_48f48ae5",
+                  "",
+                  "Resumo: sem falhas",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb2/pose: 5 msgs  ~0.2 Hz",
+                  "  /tb2/odom: 602 msgs  ~27.8 Hz",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_01.json"
+                ],
+                "result": {
+                  "command": "replay",
+                  "robot_id": "tb2",
+                  "route": "fleet_pilot_tb2_v3",
+                  "expected_route_yaml": "routes/tb2/fleet_pilot_tb2_v3.yaml",
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": true,
+                  "failures_reported": 0,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb2. Bag: collections/tb2/2026-10-03_17-32-01_261747_48f48ae5",
+                  "rosbag_path": "collections/tb2/2026-10-03_17-32-01_261747_48f48ae5",
+                  "sensor_summary": {
+                    "/tb2/pose": {
+                      "msgs": 5,
+                      "hz_est": 0.2
+                    },
+                    "/tb2/odom": {
+                      "msgs": 602,
+                      "hz_est": 27.8
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 21.64
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "replay",
+                      "--route",
+                      "fleet_pilot_tb2_v3",
+                      "--robot",
+                      "tb2",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_01.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T17:32:23.087932+00:00",
+                  "git": {
+                    "commit": "797580c46a46303788d25a11e899115d63faba92",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 0
+              },
+              {
+                "label": "replay_02",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route fleet_pilot_tb2_v3 --robot tb2 --topics odom pose --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_02.json",
+                  "",
+                  "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+                  "robot='tb2' route=fleet_pilot_tb2_v3",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_02.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb2/2026-10-03_17-32-26_138319_d995df4d",
+                  "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+                  "[TRACE] Chamando service play_route ...",
+                  "[OK] play_route — Navigation started",
+                  "[OK] navegação iniciou (navigating)",
+                  "[OK] navegação terminou (idle)",
+                  "[TRACE] Chamando service disable_collection ...",
+                  "[OK] disable_collection — Collection disabled for tb2. Bag: collections/tb2/2026-10-03_17-32-26_138319_d995df4d",
+                  "",
+                  "Resumo: sem falhas",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb2/pose: 3 msgs  ~0.2 Hz",
+                  "  /tb2/odom: 554 msgs  ~27.8 Hz",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_02.json"
+                ],
+                "result": {
+                  "command": "replay",
+                  "robot_id": "tb2",
+                  "route": "fleet_pilot_tb2_v3",
+                  "expected_route_yaml": "routes/tb2/fleet_pilot_tb2_v3.yaml",
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": true,
+                  "failures_reported": 0,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb2. Bag: collections/tb2/2026-10-03_17-32-26_138319_d995df4d",
+                  "rosbag_path": "collections/tb2/2026-10-03_17-32-26_138319_d995df4d",
+                  "sensor_summary": {
+                    "/tb2/pose": {
+                      "msgs": 3,
+                      "hz_est": 0.2
+                    },
+                    "/tb2/odom": {
+                      "msgs": 554,
+                      "hz_est": 27.8
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 19.91
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "replay",
+                      "--route",
+                      "fleet_pilot_tb2_v3",
+                      "--robot",
+                      "tb2",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_02.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T17:32:46.187502+00:00",
+                  "git": {
+                    "commit": "797580c46a46303788d25a11e899115d63faba92",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 0
+              },
+              {
+                "label": "replay_03",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route fleet_pilot_tb2_v3 --robot tb2 --topics odom pose --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_03.json",
+                  "",
+                  "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+                  "robot='tb2' route=fleet_pilot_tb2_v3",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_03.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb2/2026-10-03_17-32-47_742047_f88084ca",
+                  "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+                  "[TRACE] Chamando service play_route ...",
+                  "[OK] play_route — Navigation started",
+                  "[OK] navegação iniciou (navigating)",
+                  "[OK] navegação terminou (idle)",
+                  "[TRACE] Chamando service disable_collection ...",
+                  "[OK] disable_collection — Collection disabled for tb2. Bag: collections/tb2/2026-10-03_17-32-47_742047_f88084ca",
+                  "",
+                  "Resumo: sem falhas",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb2/pose: 3 msgs  ~0.1 Hz",
+                  "  /tb2/odom: 568 msgs  ~27.8 Hz",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_03.json"
+                ],
+                "result": {
+                  "command": "replay",
+                  "robot_id": "tb2",
+                  "route": "fleet_pilot_tb2_v3",
+                  "expected_route_yaml": "routes/tb2/fleet_pilot_tb2_v3.yaml",
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": true,
+                  "failures_reported": 0,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb2. Bag: collections/tb2/2026-10-03_17-32-47_742047_f88084ca",
+                  "rosbag_path": "collections/tb2/2026-10-03_17-32-47_742047_f88084ca",
+                  "sensor_summary": {
+                    "/tb2/pose": {
+                      "msgs": 3,
+                      "hz_est": 0.1
+                    },
+                    "/tb2/odom": {
+                      "msgs": 568,
+                      "hz_est": 27.8
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 20.41
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "replay",
+                      "--route",
+                      "fleet_pilot_tb2_v3",
+                      "--robot",
+                      "tb2",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_v3_1138d6bd_replay_03.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T17:33:08.253805+00:00",
+                  "git": {
+                    "commit": "797580c46a46303788d25a11e899115d63faba92",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 0
+              }
+            ],
+            "summary": {
+              "generated_at": "2026-10-03T17:33:09.539259+00:00",
+              "reference_run_index": 0,
+              "reference_label": "baseline",
+              "runs": [
+                {
+                  "label": "baseline",
+                  "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/tb2/2026-10-03_17-31-20_029603_2e2c2bbe",
+                  "traj_topic": "/tb2/pose",
+                  "num_poses": 3,
+                  "duration_sec": 1.0020000000000095,
+                  "path_length_m": 0.2578307000666111,
+                  "start_xy": [
+                    0.06190741766819974,
+                    0.08287829428965063
+                  ],
+                  "end_xy": [
+                    0.1895182391600429,
+                    0.3067152121896779
+                  ],
+                  "static_traj_warn": false
+                },
+                {
+                  "label": "replay_01",
+                  "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/tb2/2026-10-03_17-32-01_261747_48f48ae5",
+                  "traj_topic": "/tb2/pose",
+                  "num_poses": 5,
+                  "duration_sec": 12.599999999999994,
+                  "path_length_m": 0.44663206535543293,
+                  "start_xy": [
+                    0.1316152489396748,
+                    0.21225568700716257
+                  ],
+                  "end_xy": [
+                    0.12167696526106214,
+                    0.1669730303660245
+                  ],
+                  "static_traj_warn": false
+                },
+                {
+                  "label": "replay_02",
+                  "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/tb2/2026-10-03_17-32-26_138319_d995df4d",
+                  "traj_topic": "/tb2/pose",
+                  "num_poses": 3,
+                  "duration_sec": 8.49900000000001,
+                  "path_length_m": 0.17337100766536886,
+                  "start_xy": [
+                    0.05756248481129417,
+                    0.0932140768693942
+                  ],
+                  "end_xy": [
+                    0.061500103009509616,
+                    0.0816800655293839
+                  ],
+                  "static_traj_warn": false
+                },
+                {
+                  "label": "replay_03",
+                  "bag_path": "/home/eduardo/fleet-ui/fleet_ws/collections/tb2/2026-10-03_17-32-47_742047_f88084ca",
+                  "traj_topic": "/tb2/pose",
+                  "num_poses": 3,
+                  "duration_sec": 11.499000000000024,
+                  "path_length_m": 0.1912887974713231,
+                  "start_xy": [
+                    -0.016429780239961715,
+                    0.022622332353500176
+                  ],
+                  "end_xy": [
+                    0.12042046814480808,
+                    0.15161217424445653
+                  ],
+                  "static_traj_warn": false
+                }
+              ],
+              "pairwise_rmse_m": [
+                [
+                  0.0,
+                  0.15306713881753023,
+                  0.1763446069947107,
+                  0.15431033280411202
+                ],
+                [
+                  0.15306713881753023,
+                  0.0,
+                  0.04570130715995505,
+                  0.04753150177815164
+                ],
+                [
+                  0.1763446069947107,
+                  0.04570130715995505,
+                  0.0,
+                  0.03792249654792616
+                ],
+                [
+                  0.15431033280411202,
+                  0.04753150177815164,
+                  0.03792249654792616,
+                  0.0
+                ]
+              ],
+              "vs_reference": [
+                {
+                  "label": "baseline",
+                  "final_endpoint_error_m": 0.0,
+                  "duration_sec": 1.0020000000000095,
+                  "duration_ratio_vs_ref": 1.0,
+                  "rmse_vs_ref_m": 0.0,
+                  "mean_pointwise_distance_vs_ref_m": 0.0
+                },
+                {
+                  "label": "replay_01",
+                  "final_endpoint_error_m": 0.15533935697392187,
+                  "duration_sec": 12.599999999999994,
+                  "duration_ratio_vs_ref": 12.574850299401072,
+                  "rmse_vs_ref_m": 0.15306713881753023,
+                  "mean_pointwise_distance_vs_ref_m": 0.1497033720530047
+                },
+                {
+                  "label": "replay_02",
+                  "final_endpoint_error_m": 0.2589004836146053,
+                  "duration_sec": 8.49900000000001,
+                  "duration_ratio_vs_ref": 8.482035928143642,
+                  "rmse_vs_ref_m": 0.1763446069947107,
+                  "mean_pointwise_distance_vs_ref_m": 0.16716071686050207
+                },
+                {
+                  "label": "replay_03",
+                  "final_endpoint_error_m": 0.1697982754303194,
+                  "duration_sec": 11.499000000000024,
+                  "duration_ratio_vs_ref": 11.476047904191532,
+                  "rmse_vs_ref_m": 0.15431033280411202,
+                  "mean_pointwise_distance_vs_ref_m": 0.15158998034593538
+                }
+              ],
+              "labels": [
+                "baseline",
+                "replay_01",
+                "replay_02",
+                "replay_03"
+              ],
+              "resampling": {
+                "mode": "time",
+                "samples": 100,
+                "time_grid": "normalised_0_1"
+              }
+            },
+            "analysis_log": "Lendo baseline ... (collections/tb2/2026-10-03_17-31-20_029603_2e2c2bbe)\nLendo replay_01 ... (collections/tb2/2026-10-03_17-32-01_261747_48f48ae5)\nLendo replay_02 ... (collections/tb2/2026-10-03_17-32-26_138319_d995df4d)\nLendo replay_03 ... (collections/tb2/2026-10-03_17-32-47_742047_f88084ca)\n[OK] CSVs: /home/eduardo/fleet-ui/fleet_ws/runs/fleet_pilot_tb2_v3_1138d6bd/analysis/trajectories_csv/\n\n[OK] Resumo: /home/eduardo/fleet-ui/fleet_ws/runs/fleet_pilot_tb2_v3_1138d6bd/analysis/summary.json\n[OK] Gráfico: /home/eduardo/fleet-ui/fleet_ws/runs/fleet_pilot_tb2_v3_1138d6bd/analysis/trajectory_overlay.png\n\n--- Métricas por run ---\n  baseline: duração=1.00s  comprimento=0.258m  poses=3  topic=/tb2/pose\n  replay_01: duração=12.60s  comprimento=0.447m  poses=5  topic=/tb2/pose\n  replay_02: duração=8.50s  comprimento=0.173m  poses=3  topic=/tb2/pose\n  replay_03: duração=11.50s  comprimento=0.191m  poses=3  topic=/tb2/pose\n\n--- RMSE (m) entre pares (time) ---\n  baseline vs replay_01: 0.1531 m\n  baseline vs replay_02: 0.1763 m\n  baseline vs replay_03: 0.1543 m\n  replay_01 vs replay_02: 0.0457 m\n  replay_01 vs replay_03: 0.0475 m\n  replay_02 vs replay_03: 0.0379 m\n\n--- Vs referência (baseline) ---\n  baseline: RMSE=0.0000 m  dist_média_pt=0.0000 m  Δfim=0.0000 m  duração×=1.000\n  replay_01: RMSE=0.1531 m  dist_média_pt=0.1497 m  Δfim=0.1553 m  duração×=12.575\n  replay_02: RMSE=0.1763 m  dist_média_pt=0.1672 m  Δfim=0.2589 m  duração×=8.482\n  replay_03: RMSE=0.1543 m  dist_média_pt=0.1516 m  Δfim=0.1698 m  duração×=11.476\n",
+            "error": null,
+            "run_id": "fleet_pilot_tb2_v3_1138d6bd"
+          }
+        },
+        {
+          "tool_name": "analyze_experiment",
+          "tool_input": {
+            "run_id": "fleet_pilot_tb2_v3_1138d6bd"
+          },
+          "result": {
+            "run_id": "fleet_pilot_tb2_v3_1138d6bd",
+            "reference_label": "baseline",
+            "num_runs": 4,
+            "mean_rmse_vs_ref_m": 0.16124069287211765,
+            "max_rmse_vs_ref_m": 0.1763446069947107,
+            "rmse_threshold_m": 0.05,
+            "flagged_runs": [
+              {
+                "label": "replay_01",
+                "final_endpoint_error_m": 0.15533935697392187,
+                "duration_sec": 12.599999999999994,
+                "duration_ratio_vs_ref": 12.574850299401072,
+                "rmse_vs_ref_m": 0.15306713881753023,
+                "mean_pointwise_distance_vs_ref_m": 0.1497033720530047
+              },
+              {
+                "label": "replay_02",
+                "final_endpoint_error_m": 0.2589004836146053,
+                "duration_sec": 8.49900000000001,
+                "duration_ratio_vs_ref": 8.482035928143642,
+                "rmse_vs_ref_m": 0.1763446069947107,
+                "mean_pointwise_distance_vs_ref_m": 0.16716071686050207
+              },
+              {
+                "label": "replay_03",
+                "final_endpoint_error_m": 0.1697982754303194,
+                "duration_sec": 11.499000000000024,
+                "duration_ratio_vs_ref": 11.476047904191532,
+                "rmse_vs_ref_m": 0.15431033280411202,
+                "mean_pointwise_distance_vs_ref_m": 0.15158998034593538
+              }
+            ]
+          }
+        }
+      ],
+      "final_text": "A campanha `fleet_pilot_tb2_v3_1138d6bd` rodou sem falhas nas 4 execuções (1 baseline e 3 replays), mas os 3 replays ficaram acima do limiar de 0,05 m de RMSE.\n\n**Antes de rodar:** o tb2 estava ocioso e sem coleta ativa. A rota `fleet_pilot_tb2_v3` não existia, então era realmente nova. Ela foi gravada com 11 poses.\n\n**RMSE em relação ao baseline (limiar 0,05 m)**\n\n| Execução | RMSE (m) | Erro no ponto final (m) | Duração (s) |\n|---|---|---|---|\n| replay_01 | 0,153 | 0,155 | 12,6 |\n| replay_02 | 0,176 | 0,259 | 8,5 |\n| replay_03 | 0,154 | 0,170 | 11,5 |\n\n- O RMSE médio contra o baseline é 0,161 m e o máximo é 0,176 m, no replay_02.\n- Os replays são parecidos entre si, com RMSE de 0,038 a 0,048 m. Eles divergem do baseline, mas não um do outro.\n\n**Pontos de atenção**\n- **Baseline curto demais:** no `/tb2/pose` ele tem só 3 poses e 1,0 s de duração, e um percurso de 0,26 m. O percurso teórico é de 2,56 m, e a gravação durou 39,7 s no bag.\n- **Pouco dado de pose:** o `/tb2/pose` publica a cerca de 0,1 a 0,2 Hz, com 3 a 5 mensagens por execução. O `/tb2/odom` tem de 554 a 1104 mensagens, mas a análise usou o `/tb2/pose`. O RMSE comparado com tão poucos pontos é pouco confiável.\n- **Poses perto da origem:** as poses ficam entre 0 e 0,3 m, longe dos waypoints (0,5, 2) e (1,0, 2). Isso sugere que a pose usada não reflete o percurso real.\n- **TF na gravação:** o log mostrou `[FALHOU] TF map->base_link disponível`, embora o resumo diga \"sem falhas\". Isso pode estar ligado ao problema de pose.\n\nOs 0,16 m de RMSE provavelmente refletem mais um problema de amostragem ou de referência de pose do que uma falha real de repetibilidade. Se quiser, rodo o `diagnose_experiment` para levantar hipóteses por execução. Outra opção é repetir a campanha incluindo o `odom` na análise.",
+      "error": null,
+      "instruction": "Use run_campaign com robot=\"tb2\", route=\"fleet_pilot_tb2_v3\" (rota NOVA), points=[[0.5,2,0],[1.0,2,0]], repetitions=3, collect=true, topics=[\"odom\",\"pose\"]. Depois use analyze_experiment pra me dar o RMSE."
+    }
+  },
+  "model": "claude-sonnet-5-5",
+  "started_at": "2026-10-03T17:31:08.324829+00:00",
+  "finished_at": "2026-10-03T17:33:27.104722+00:00"
+}

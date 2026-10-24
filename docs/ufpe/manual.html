@@ -1,0 +1,359 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Fleet UI para o Teste BLE</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: guia de laboratório em coluna única; o percurso em "L" do experimento abre a página e uma régua de RSSI marca o avanço pelos passos. */
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #14202b;
+  --muted: #566573;
+  --line: #d9e0e6;
+  --signal: #0a63c9;
+  --signal-soft: #e3eefb;
+  --weak: #c2410c;
+  --weak-soft: #fdebe1;
+  --ok: #157347;
+  --code-bg: #0f1a24;
+  --code-ink: #dbe7f2;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d151c; --surface: #15212b; --ink: #e6edf3; --muted: #9aabba; --line: #263644;
+    --signal: #5aa6f5; --signal-soft: #132b44; --weak: #f08a55; --weak-soft: #3a2116; --ok: #4cc38a;
+    --code-bg: #091017; --code-ink: #d6e4f0; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d151c; --surface: #15212b; --ink: #e6edf3; --muted: #9aabba; --line: #263644;
+  --signal: #5aa6f5; --signal-soft: #132b44; --weak: #f08a55; --weak-soft: #3a2116; --ok: #4cc38a;
+  --code-bg: #091017; --code-ink: #d6e4f0; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body);
+  font-size: 1rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 4rem;
+}
+.wrap { max-width: 860px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: 1.55rem; font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 600; }
+p { margin: 0; max-width: 66ch; }
+a { color: var(--signal); }
+code { font-family: var(--mono); font-size: 0.88em; background: var(--signal-soft); padding: 0.08em 0.35em; border-radius: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+/* Abertura */
+header.hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 2rem; align-items: center; padding-block: 3rem 2rem; }
+header.hero .lede { display: grid; gap: 1rem; }
+header.hero .lede p { color: var(--muted); font-size: 1.08rem; }
+.route { width: 100%; height: auto; display: block; }
+.route .axis { stroke: var(--line); }
+.route .path { stroke: var(--signal); }
+.route .lbl { fill: var(--ink); font-family: var(--mono); font-size: 11px; }
+.route .dim { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+.route .dot { fill: var(--surface); stroke: var(--signal); }
+.route .phone { fill: var(--weak); }
+@media (max-width: 680px) { header.hero { grid-template-columns: 1fr; padding-block: 2rem 1rem; } }
+
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-block: 1rem 2.5rem; }
+.facts div { background: var(--surface); padding: 0.9rem 1rem; display: grid; gap: 0.15rem; }
+.facts b { font-family: var(--display); font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.facts span { color: var(--muted); font-size: 0.85rem; }
+
+/* Passos */
+.step { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: 1.25rem; padding-block: 2rem; border-top: 1px solid var(--line); }
+.rssi { display: grid; align-content: start; justify-items: start; gap: 0.35rem; }
+.rssi .n { font-family: var(--display); font-size: 2rem; font-weight: 700; color: var(--signal); line-height: 1; }
+.rssi .bars { display: flex; gap: 3px; align-items: flex-end; height: 18px; }
+.rssi .bars i { width: 5px; background: var(--line); border-radius: 1px; }
+.rssi .bars i.on { background: var(--signal); }
+.rssi .db { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.step .body { display: grid; gap: 0.9rem; min-width: 0; }
+@media (max-width: 560px) { .step { grid-template-columns: 1fr; gap: 0.6rem; } .rssi { grid-auto-flow: column; align-items: center; gap: 0.75rem; } }
+
+.cmd { position: relative; background: var(--code-bg); color: var(--code-ink); border-radius: 8px; min-width: 0; }
+.cmd pre { margin: 0; padding: 2.4rem 1rem 0.9rem; overflow-x: auto; font-family: var(--mono); font-size: 0.84rem; line-height: 1.55; }
+.cmd .c { color: #7f95a8; }
+.cmd button { position: absolute; top: 0.5rem; right: 0.5rem; font: 500 0.75rem var(--body); color: var(--code-ink); background: transparent; border: 1px solid #34495c; border-radius: 6px; padding: 0.25rem 0.6rem; cursor: pointer; }
+.cmd button:hover, .cmd button:focus-visible { border-color: var(--code-ink); outline: none; }
+
+.note { border-left: 3px solid var(--signal); background: var(--signal-soft); padding: 0.75rem 1rem; border-radius: 0 8px 8px 0; max-width: 100%; }
+.note.warn { border-left-color: var(--weak); background: var(--weak-soft); }
+.note b { font-weight: 600; }
+
+figure { margin: 0; display: grid; gap: 0.4rem; }
+figure img { width: 100%; border-radius: 8px; border: 1px solid var(--line); display: block; }
+figcaption { font-size: 0.85rem; color: var(--muted); }
+.shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+@media (max-width: 640px) { .shots { grid-template-columns: 1fr; } }
+
+ol.clicks { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; }
+ol.clicks li::marker { font-family: var(--mono); color: var(--signal); }
+ul.plain { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
+
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 0.5rem 0.75rem; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+thead th { font-weight: 600; color: var(--muted); font-size: 0.78rem; }
+tbody tr:last-child td { border-bottom: 0; }
+
+details { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+details + details { margin-top: 0.5rem; }
+summary { cursor: pointer; padding: 0.75rem 1rem; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 1rem; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-family: var(--mono); color: var(--signal); }
+details[open] summary::after { content: "–"; }
+summary:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; border-radius: 8px; }
+details .in { padding: 0 1rem 1rem; display: grid; gap: 0.7rem; }
+
+.status { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+.status .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem; display: grid; gap: 0.5rem; align-content: start; }
+.pill { justify-self: start; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.15rem 0.55rem; border-radius: 999px; }
+.pill.ok { color: var(--ok); border: 1px solid currentColor; }
+.pill.open { color: var(--weak); border: 1px solid currentColor; }
+
+footer { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 1.25rem; color: var(--muted); font-size: 0.88rem; display: grid; gap: 0.4rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="lede">
+    <span class="eyebrow">Guia de instalação e uso · CIn-UFPE</span>
+    <h1>Fleet UI para o teste BLE</h1>
+    <p>Simulação aberta do percurso, com um botão para executar e os scripts de análise já integrados. Este guia leva do computador vazio até o gráfico de RSSI.</p>
+  </div>
+  <svg class="route" viewBox="0 0 300 250" role="img" aria-label="Percurso em L: 64 metros em linha reta e depois 31 metros até o ponto final">
+    <line class="axis" x1="20" y1="230" x2="290" y2="230" stroke-width="1"/>
+    <line class="axis" x1="20" y1="20" x2="20" y2="230" stroke-width="1"/>
+    <polyline class="path" points="240,30 232,205 70,205" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="8 6"/>
+    <circle class="dot" cx="240" cy="30" r="8" stroke-width="3"/>
+    <circle class="dot" cx="232" cy="205" r="8" stroke-width="3"/>
+    <circle class="dot" cx="70" cy="205" r="8" stroke-width="3"/>
+    <rect class="phone" x="234" y="22" width="12" height="16" rx="2"/>
+    <text class="lbl" x="196" y="20">START</text>
+    <text class="lbl" x="182" y="226">MIDPOINT</text>
+    <text class="lbl" x="44" y="226">FINAL</text>
+    <text class="dim" x="248" y="122">64,1 m</text>
+    <text class="dim" x="132" y="196">31,2 m</text>
+  </svg>
+</header>
+
+<div class="facts" aria-label="Resultado da simulação">
+  <div><b>96,3 m</b><span>percorridos no replay pela tela</span></div>
+  <div><b>0,248 m/s</b><span>velocidade média (artigo: 0,244 a 0,253)</span></div>
+  <div><b>≈ 6,5 min</b><span>por corrida completa</span></div>
+  <div><b>6 de 6</b><span>corridas reais da Tabela 3 recalculadas</span></div>
+</div>
+
+<section class="step" id="antes">
+  <div class="rssi" aria-hidden="true"><span class="n">0</span><span class="bars"><i class="on" style="height:5px"></i><i class="on" style="height:9px"></i><i class="on" style="height:13px"></i><i class="on" style="height:18px"></i></span><span class="db">−60 dBm</span></div>
+  <div class="body">
+    <h2>Antes de começar</h2>
+    <ul class="plain">
+      <li>Ubuntu 22.04 serve. Não é preciso instalar ROS no computador: tudo roda dentro de um contêiner com Ubuntu 24.04 e ROS 2 Jazzy.</li>
+      <li>Uns 15 GB livres em disco e internet boa na primeira vez (o download é grande).</li>
+      <li>Acesso ao repositório no GitHub.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="step" id="docker">
+  <div class="rssi" aria-hidden="true"><span class="n">1</span><span class="bars"><i class="on" style="height:5px"></i><i class="on" style="height:9px"></i><i class="on" style="height:13px"></i><i style="height:18px"></i></span><span class="db">−75 dBm</span></div>
+  <div class="body">
+    <h2>Instalar o Docker</h2>
+    <p>Use o Docker oficial. Os pacotes antigos <code>docker.io</code> e <code>docker-compose</code> do Ubuntu não servem.</p>
+    <div class="cmd"><button type="button">Copiar</button><pre>sudo apt-get update
+sudo apt-get install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release &amp;&amp; echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER</pre></div>
+    <div class="note"><b>Depois do último comando, saiam da sessão e entrem de novo</b> (ou reiniciem). Para conferir, <code>docker run hello-world</code> deve funcionar sem <code>sudo</code>.</div>
+  </div>
+</section>
+
+<section class="step" id="baixar">
+  <div class="rssi" aria-hidden="true"><span class="n">2</span><span class="bars"><i class="on" style="height:5px"></i><i class="on" style="height:9px"></i><i class="on" style="height:13px"></i><i style="height:18px"></i></span><span class="db">−82 dBm</span></div>
+  <div class="body">
+    <h2>Baixar e montar</h2>
+    <div class="cmd"><button type="button">Copiar</button><pre>git clone https://github.com/eduardowanderleyde/fleet-ui-ufpe.git ~/fleet-ui
+cd ~/fleet-ui
+make docker-build   <span class="c"># só na primeira vez: 15 a 30 min</span></pre></div>
+    <p>Se o repositório for privado, o GitHub pede login: usem <code>gh auth login</code> ou um token de acesso, porque a senha da conta não funciona no <code>git clone</code>.</p>
+    <div class="note"><b>Sem GitHub:</b> se o Eduardo entregou o arquivo <code>fleet-ui-ufpe-….zip</code>, descompactem e entrem na pasta. O resto é igual:<div class="cmd" style="margin-top:0.5rem"><button type="button">Copiar</button><pre>unzip fleet-ui-ufpe-*.zip -d ~
+cd ~/fleet-ui
+make docker-build</pre></div></div>
+  </div>
+</section>
+
+<section class="step" id="subir">
+  <div class="rssi" aria-hidden="true"><span class="n">3</span><span class="bars"><i class="on" style="height:5px"></i><i class="on" style="height:9px"></i><i style="height:13px"></i><i style="height:18px"></i></span><span class="db">−88 dBm</span></div>
+  <div class="body">
+    <h2>Ligar a simulação</h2>
+    <div class="cmd"><button type="button">Copiar</button><pre>cd ~/fleet-ui
+make cbsoft-up</pre></div>
+    <p>Esse terminal fica ocupado mostrando o que está acontecendo; deixem aberto. Em cerca de 1 minuto, abram <code>http://localhost:5173</code> no navegador.</p>
+    <p>O robô aparece no START de vocês, num salão aberto com coordenadas iguais às do mapa <code>hall_cin_v4</code>. A simulação usa o domínio ROS 42, para nunca conversar com um TurtleBot4 de verdade que esteja na mesma rede (eles usam o domínio 0).</p>
+    <figure>
+      <img src="img/1_abertura.png" alt="Tela inicial do Fleet UI com o percurso CBSoft desenhado sobre o mapa e o robô no ponto inicial" loading="lazy">
+      <figcaption>A tela já abre em Reproduzir, com o percurso <code>percurso_cbsoft</code> desenhado.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="step" id="rodar">
+  <div class="rssi" aria-hidden="true"><span class="n">4</span><span class="bars"><i class="on" style="height:5px"></i><i class="on" style="height:9px"></i><i style="height:13px"></i><i style="height:18px"></i></span><span class="db">−93 dBm</span></div>
+  <div class="body">
+    <h2>Rodar o percurso pela tela</h2>
+    <ol class="clicks">
+      <li>Cliquem em <b>Conectar robô</b>, deixem marcado <b>Custom (simulação local)</b> e cliquem em <b>Conectar</b>. Isso só confirma que a tela está falando com o servidor; não procura Bluetooth. As opções “TurtleBot3 · em breve” ainda não funcionam.</li>
+      <li>Cliquem em <b>▶ Executar replay</b>. O robô percorre os 96 m em cerca de 6,5 minutos, gravando os sensores.</li>
+      <li>No fim, o painel da direita mostra <b>Sucesso</b>, a distância e a velocidade média.</li>
+    </ol>
+    <div class="shots">
+      <figure><img src="img/0_conectar.png" alt="Painel Conectar robô com a opção Custom (simulação local) marcada" loading="lazy"><figcaption>Conectar: deixem “Custom (simulação local)”.</figcaption></figure>
+      <figure><img src="img/2_descendo.png" alt="Robô no primeiro trecho do percurso" loading="lazy"><figcaption>Primeiro trecho, os 64 m em linha reta.</figcaption></figure>
+      <figure><img src="img/3_trecho_final.png" alt="Robô no trecho final do percurso" loading="lazy"><figcaption>Depois da curva, os 31 m finais.</figcaption></figure>
+      <figure><img src="img/4_fim_sucesso.png" alt="Fim da corrida com a mensagem Sucesso e as métricas" loading="lazy"><figcaption>Fim: distância e velocidade média no canto direito.</figcaption></figure>
+    </div>
+    <div class="note"><b>Para repetir uma corrida,</b> parem o terminal do passo 3 com Ctrl+C e rodem <code>make cbsoft-up</code> de novo (cerca de 1 min). O robô volta ao START. A volta automática pela tela existe, mas ainda não foi validada numa rota deste tamanho.</div>
+  </div>
+</section>
+
+<section class="step" id="script">
+  <div class="rssi" aria-hidden="true"><span class="n">5</span><span class="bars"><i class="on" style="height:5px"></i><i style="height:9px"></i><i style="height:13px"></i><i style="height:18px"></i></span><span class="db">−97 dBm</span></div>
+  <div class="body">
+    <h2>Ou rodar o script original de vocês</h2>
+    <p>Com a simulação ligada, num segundo terminal:</p>
+    <div class="cmd"><button type="button">Copiar</button><pre>cd ~/fleet-ui
+make cbsoft-run</pre></div>
+    <p>Roda o <code>nav_3points.py</code> sem nenhuma alteração de coordenadas e grava o CSV de sempre em <code>fleet_ws/collections/cbsoft/</code>. Em duas corridas assim, o robô andou 96,3 e 96,5 m a 0,254 e 0,253 m/s, em 382 e 383 s.</p>
+  </div>
+</section>
+
+<section class="step" id="analise">
+  <div class="rssi" aria-hidden="true"><span class="n">6</span><span class="bars"><i class="on" style="height:5px"></i><i style="height:9px"></i><i style="height:13px"></i><i style="height:18px"></i></span><span class="db">−101 dBm</span></div>
+  <div class="body">
+    <h2>Gerar o gráfico de RSSI</h2>
+    <p>Os scripts de vocês (<code>sync_rssi_nav.py</code> e <code>analise_agregados.py</code>) estão em <code>fleet_ws/scripts/cbsoft/analise/</code>. O replay pela tela grava em MCAP; primeiro, convertam para o mesmo CSV do <code>nav_3points.py</code>:</p>
+    <div class="cmd"><button type="button">Copiar</button><pre>make cbsoft-csv   <span class="c"># pega a gravação mais recente</span></pre></div>
+    <p>Depois, coloquem o log do nRF Connect dentro de <code>fleet_ws/collections/</code> e rodem:</p>
+    <div class="cmd"><button type="button">Copiar</button><pre>make cbsoft-analise NAV=collections/cbsoft/&lt;navegacao&gt;.csv NRF="collections/cbsoft/nrf/&lt;log&gt;.txt"</pre></div>
+    <p>O PNG sai ao lado do CSV. Os horários do CSV usam o fuso do computador, para casar com o log do celular.</p>
+
+    <h3>Conferimos com os dados de 19/05</h3>
+    <p>Recalculando a Tabela 3 do artigo a partir dos arquivos brutos das seis corridas, com a sincronização de vocês:</p>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Config.</th><th>Corrida</th><th>RSSI artigo</th><th>RSSI refeito</th><th>Dist. artigo</th><th>Dist. refeita</th></tr></thead>
+        <tbody>
+          <tr><td>Homogênea</td><td>1</td><td>−89,83</td><td>−89,72</td><td>68,4 m</td><td>68,6 m</td></tr>
+          <tr><td>Homogênea</td><td>2</td><td>−90,51</td><td>−90,35</td><td>67,3 m</td><td>67,6 m</td></tr>
+          <tr><td>Homogênea</td><td>3</td><td>−91,97</td><td>−91,70</td><td>66,9 m</td><td>67,2 m</td></tr>
+          <tr><td>Heterogênea</td><td>1</td><td>−95,72</td><td>−95,36</td><td>39,4 m</td><td>39,2 m</td></tr>
+          <tr><td>Heterogênea</td><td>2</td><td>−97,30</td><td>−97,16</td><td>47,3 m</td><td>47,3 m</td></tr>
+          <tr><td>Heterogênea</td><td>3</td><td>−97,11</td><td>−96,74</td><td>41,6 m</td><td>41,7 m</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>As diferenças ficam abaixo de 0,4 dBm e 0,3 m.</p>
+  </div>
+</section>
+
+<section class="step" id="achado">
+  <div class="rssi" aria-hidden="true"><span class="n">!</span><span class="bars"><i class="on" style="height:5px"></i><i style="height:9px"></i><i style="height:13px"></i><i style="height:18px"></i></span><span class="db">−103 dBm</span></div>
+  <div class="body">
+    <h2>Um detalhe no script de vocês</h2>
+    <p>O <code>nav_3points.py</code> assina <code>/amcl_pose</code> com o QoS padrão (VOLATILE). O AMCL publica essa pose como TRANSIENT_LOCAL e só republica quando o robô se move. Por isso, as primeiras linhas do CSV podem sair com pose (0, 0).</p>
+    <p>Aconteceu numa das seis corridas: a homogênea 1, de 19/05 às 15:57, com 3 linhas em (0, 0). Descartando essas linhas, a distância até desconectar dá 68,6 m, contra 68,4 m no artigo. <b>O resultado publicado não foi afetado.</b></p>
+    <p>Para as próximas corridas, assinar com a mesma durabilidade do AMCL resolve:</p>
+    <div class="cmd"><button type="button">Copiar</button><pre>from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy
+
+amcl_qos = QoSProfile(depth=1,
+                      durability=DurabilityPolicy.TRANSIENT_LOCAL,
+                      reliability=ReliabilityPolicy.RELIABLE)
+self.create_subscription(PoseWithCovarianceStamped, "/amcl_pose",
+                         self.pose_callback, amcl_qos)</pre></div>
+  </div>
+</section>
+
+<section class="step" id="robo">
+  <div class="rssi" aria-hidden="true"><span class="n">7</span><span class="bars"><i style="height:5px"></i><i style="height:9px"></i><i style="height:13px"></i><i style="height:18px"></i></span><span class="db">desconectou</span></div>
+  <div class="body">
+    <h2>No dia do teste com o TurtleBot4</h2>
+    <p>A simulação está pronta. O que falta só dá para resolver no laboratório, com o robô de verdade:</p>
+    <div class="status">
+      <div class="card"><span class="pill ok">pronto</span><h3>Percurso e análise</h3><p>Percurso reproduzido, botão de execução, conversão para CSV e scripts de análise de vocês funcionando.</p></div>
+      <div class="card"><span class="pill open">a testar</span><h3>Instalação na máquina de vocês</h3><p>Docker no Ubuntu 22.04 e o primeiro <code>make docker-build</code>.</p></div>
+      <div class="card"><span class="pill open">a testar no robô</span><h3>Jazzy conversando com Humble</h3><p>As actions do Nav2 mudaram entre as versões, então o Nav2 roda no PC, do lado do Fleet UI, como no setup de vocês. O robô só manda laser, odometria e TF e recebe velocidade; essas mensagens são idênticas no Humble e no Jazzy.</p></div>
+      <div class="card"><span class="pill open">a fazer</span><h3>Leitura BLE no robô</h3><p>A leitura do Bluetooth a bordo do robô real ainda não está integrada ao Fleet UI.</p></div>
+    </div>
+    <h3>Primeiro passo no dia: a checagem pré-voo</h3>
+    <p>Com o robô ligado e na mesma rede, antes de mover qualquer coisa:</p>
+    <div class="cmd"><button type="button">Copiar</button><pre>cd ~/fleet-ui
+make robot-check   <span class="c"># domínio 0 e CycloneDDS, como o robô de vocês</span></pre></div>
+    <p>Ela só escuta, não publica nada. Confere os nós do robô, os tópicos <code>/scan</code>, <code>/odom</code>, <code>/tf</code> e <code>/tf_static</code>, as taxas, o TF <code>odom → base_link</code> e a defasagem de relógio entre robô e PC, os mesmos problemas do guia de troubleshooting de vocês. Também avisa se já há um Nav2 rodando, que precisa ser desligado antes do Nav2 do Fleet UI subir.</p>
+    <h3>Depois: ligar o Fleet UI no robô</h3>
+    <p>Com a checagem toda OK, desliguem o Nav2 que vocês costumam subir no Docker de vocês (ele é Humble e não conversa com o do Fleet UI) e rodem:</p>
+    <div class="cmd"><button type="button">Copiar</button><pre>make robot-up</pre></div>
+    <p>Sobe no PC o mapa <code>hall_cin_v4</code>, o AMCL com o robô no START e o Nav2, sem simulação, no domínio e middleware do robô. A tela abre no mesmo endereço, <code>http://localhost:5173</code>. Se o robô não estiver exatamente no START, ajustem a pose inicial: <code>make robot-up X_POSE=… Y_POSE=… YAW=…</code>.</p>
+    <p>Testamos tudo isso com um robô falso, que publica laser, odometria e TF como o TurtleBot4: a checagem passou, o Nav2 subiu e um deslocamento de 1 m terminou com sucesso. O teste com o robô de verdade é o que falta.</p>
+    <div class="note warn"><b>Segurança.</b> Na primeira vez, deixem o robô com espaço livre em volta e alguém perto dele. O botão <b>■ Parar</b> da tela cancela a navegação, mas leva cerca de 3 s para o robô parar (ele anda ainda uns 80 cm): numa emergência, a parada é física. Comecem com um deslocamento curto antes do percurso de 96 m. O roteiro do dia tem o passo a passo completo.</div>
+  </div>
+</section>
+
+<section class="step" id="problemas">
+  <div class="rssi" aria-hidden="true"><span class="n">?</span><span class="bars"><i style="height:5px"></i><i style="height:9px"></i><i style="height:13px"></i><i style="height:18px"></i></span><span class="db">ajuda</span></div>
+  <div class="body">
+    <h2>Se algo der errado</h2>
+    <details><summary>“permission denied” ao rodar docker</summary><div class="in"><p>O usuário ainda não está no grupo <code>docker</code>. Saiam da sessão e entrem de novo depois do <code>usermod</code> do passo 1.</p></div></details>
+    <details><summary>O terminal repete “list of world names” sem parar</summary><div class="in"><p>O servidor do Gazebo caiu na subida. Parem com Ctrl+C e rodem:</p><div class="cmd"><button type="button">Copiar</button><pre>make docker-down
+make cbsoft-up</pre></div></div></details>
+    <details><summary>A página em localhost:5173 não abre</summary><div class="in"><p>Esperem o terminal do passo 3 mostrar o servidor pronto (cerca de 1 min). Se a porta estiver ocupada por outro programa, fechem esse programa e subam de novo.</p></div></details>
+    <details><summary>O robô parou no meio ou o Nav2 abortou</summary><div class="in"><p>Reiniciem com Ctrl+C e <code>make cbsoft-up</code>. Se acontecer sempre, mandem para o Eduardo a saída de <code>make docker-logs</code>.</p></div></details>
+    <details><summary>Alguém da rede também usa o domínio 42</summary><div class="in"><p>Escolham outro número:</p><div class="cmd"><button type="button">Copiar</button><pre>make cbsoft-up CBSOFT_DOMAIN=57</pre></div></div></details>
+  </div>
+</section>
+
+<footer>
+  <p>Fleet UI, repositório <code>fleet-ui-ufpe</code>. Experimento original: “Wireless Connectivity Testing with Mobile Robots: A Bluetooth Low Energy Case Study”, CBSoft 2026.</p>
+  <p>Dúvidas: falem com o Eduardo.</p>
+</footer>
+
+</div>
+
+<script>
+document.querySelectorAll('.cmd button').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var pre = btn.parentElement.querySelector('pre');
+    var text = pre.innerText.replace(/\s+#.*$/gm, '');
+    var done = function (label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copiar'; }, 1600); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done('Copiado'); }, function () { selectPre(pre); done('Selecionado'); });
+    } else { selectPre(pre); done('Selecionado'); }
+  });
+});
+function selectPre(pre) {
+  var r = document.createRange(); r.selectNodeContents(pre);
+  var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+</script>
+
+</body></html>

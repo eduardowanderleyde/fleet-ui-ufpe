@@ -1,0 +1,64 @@
+x-fleet-common: &fleet-common
+  image: fleet-ui:dev
+  build:
+    context: .
+  network_mode: host
+  ipc: host
+  environment:
+    ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-0}
+    # Só UDP (sem memória compartilhada do Fast DDS): com ipc: host, cada
+    # container derrubado deixa segmentos órfãos em /dev/shm (já vimos 257).
+    # Obs.: os SIGBUS (exit 135 / -7) vistos em 2026-10-22 eram erro de
+    # hardware da máquina de dev (MCE no kernel), não isto — ver memory.md.
+    FASTDDS_BUILTIN_TRANSPORTS: UDPv4
+    WORLD: ${WORLD:-warehouse}
+    LOCALIZATION: ${LOCALIZATION:-slam}
+    HEADLESS: ${HEADLESS:-False}
+    NAV2_DEFAULT_SERVER_TIMEOUT_MS: ${NAV2_DEFAULT_SERVER_TIMEOUT_MS:-}
+    NAV2_NAVFN_USE_ASTAR: ${NAV2_NAVFN_USE_ASTAR:-}
+    X_POSE: ${X_POSE:-0.0}
+    Y_POSE: ${Y_POSE:-0.0}
+    YAW: ${YAW:-0.0}
+    DISPLAY: ${DISPLAY:-}
+    QT_X11_NO_MITSHM: "1"
+    FLEET_CORS_ORIGINS: ${FLEET_CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+  volumes:
+    - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    - ./fleet_ws/routes:/workspace/fleet_ws/routes
+    - ./fleet_ws/collections:/workspace/fleet_ws/collections
+    - ./fleet_ws/runs_history:/workspace/fleet_ws/runs_history
+    - ./frontend/public:/workspace/frontend/public
+
+services:
+  sim:
+    <<: *fleet-common
+    command: ["/workspace/docker/run-sim.sh"]
+
+  fleet:
+    <<: *fleet-common
+    depends_on:
+      - sim
+    environment:
+      ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-0}
+      FASTDDS_BUILTIN_TRANSPORTS: UDPv4
+      FLEET_START_DELAY: ${FLEET_START_DELAY:-18}
+    command: ["/workspace/docker/run-fleet.sh"]
+
+  backend:
+    <<: *fleet-common
+    restart: on-failure
+    depends_on:
+      - fleet
+    environment:
+      ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-0}
+      FASTDDS_BUILTIN_TRANSPORTS: UDPv4
+      BACKEND_START_DELAY: ${BACKEND_START_DELAY:-22}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      FLEET_CORS_ORIGINS: ${FLEET_CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+    command: ["/workspace/docker/run-backend.sh"]
+
+  frontend:
+    <<: *fleet-common
+    depends_on:
+      - backend
+    command: ["/workspace/docker/run-frontend.sh"]

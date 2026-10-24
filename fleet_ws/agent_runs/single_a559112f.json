@@ -1,0 +1,48 @@
+{
+  "kind": "single",
+  "job_id": "a559112f",
+  "running": false,
+  "steps": [
+    {
+      "tool_name": "list_robots",
+      "tool_input": {},
+      "result": [
+        "tb1",
+        "tb2"
+      ]
+    },
+    {
+      "tool_name": "list_routes",
+      "tool_input": {},
+      "result": [
+        "cursor_smoke02",
+        "cursor_smoke03",
+        "cursor_visible01",
+        "dissertation_clean01",
+        "percurso_initial"
+      ]
+    },
+    {
+      "tool_name": "list_routes",
+      "tool_input": {
+        "robot_id": "tb1"
+      },
+      "result": [
+        "teste_live"
+      ]
+    },
+    {
+      "tool_name": "list_routes",
+      "tool_input": {
+        "robot_id": "tb2"
+      },
+      "result": []
+    }
+  ],
+  "final_text": "## Resumo da frota\n\n**Robôs disponíveis:** `tb1`, `tb2`\n\n**Rotas globais** (não vinculadas a um robô específico):\n- cursor_smoke02\n- cursor_smoke03\n- cursor_visible01\n- dissertation_clean01\n- percurso_initial\n\n**Rotas por robô:**\n- **tb1**: teste_live\n- **tb2**: nenhuma rota salva\n\nSe quiser, posso verificar o status atual de algum robô ou reproduzir/gravar uma rota.",
+  "error": null,
+  "instruction": "Liste os robôs disponíveis e as rotas salvas para eles.",
+  "model": "claude-sonnet-5",
+  "started_at": "2026-09-22T23:11:33.050093+00:00",
+  "finished_at": "2026-09-22T23:11:59.690499+00:00"
+}

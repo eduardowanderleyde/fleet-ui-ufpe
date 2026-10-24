@@ -1,0 +1,6 @@
+# Disable sensor data collection for one robot
+string robot_id
+---
+bool success
+string message
+string error_code

@@ -1,0 +1,520 @@
+{
+  "kind": "fleet",
+  "job_id": "8296e868",
+  "running": false,
+  "robots": {
+    "tb1": {
+      "running": false,
+      "steps": [
+        {
+          "tool_name": "get_robot_status",
+          "tool_input": {
+            "robot_id": "tb1"
+          },
+          "result": {
+            "robot_id": "tb1",
+            "role": "MUUT",
+            "nav_state": "idle",
+            "current_route": "",
+            "collection_on": false,
+            "collection_file": "",
+            "last_error": "",
+            "bytes_written": 0,
+            "pose": {
+              "x": 6.911091882325114e-12,
+              "y": -7.122105856910987e-27,
+              "yaw": -1.981617398120689e-15,
+              "valid": true
+            }
+          }
+        },
+        {
+          "tool_name": "list_routes",
+          "tool_input": {
+            "robot_id": "tb1"
+          },
+          "result": []
+        },
+        {
+          "tool_name": "run_campaign",
+          "tool_input": {
+            "robot": "tb1",
+            "route": "fleet_pilot_tb1",
+            "points": [
+              [
+                0.5,
+                0,
+                0
+              ],
+              [
+                1.0,
+                0,
+                0
+              ]
+            ],
+            "repetitions": 3,
+            "collect": true,
+            "topics": [
+              "odom",
+              "pose"
+            ]
+          },
+          "result": {
+            "running": false,
+            "steps": [
+              {
+                "label": "baseline",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py record --route fleet_pilot_tb1 --robot tb1 --topics odom pose --points=0.5,0.0,0.0;1.0,0.0,0.0 --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_992be596_baseline.json",
+                  "",
+                  "=== Fase A: gravar percurso (coleta + record + waypoints) ===",
+                  "robot='tb1' route=fleet_pilot_tb1 pontos=2",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_992be596_baseline.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb1/2026-10-03_14-19-59_736570_e8019a63",
+                  "[TRACE] Chamando service start_record ...",
+                  "[OK] start_record — Recording started",
+                  "[TRACE] Esperando TF map->base_link ...",
+                  "[FALHOU] TF map->base_link disponível",
+                  "[TRACE] Aguardando /map (SLAM) ou settle do costmap (AMCL) ...",
+                  "[INFO] /map não publicado — modo AMCL com mapa pré-carregado (normal)",
+                  "[TRACE] Aguardando costmap processar mapa (3s) ...",
+                  "[TRACE] go_to_point wp1: x=0.500 y=0.000 yaw=0.000",
+                  "[OK] go_to_point wp1 (0.50, 0.00, yaw=0.00) — Navigation started",
+                  "[OK] wp1 estado navigating",
+                  "[OK] wp1 concluído (recording)",
+                  "[TRACE] go_to_point wp2: x=1.000 y=0.000 yaw=0.000",
+                  "[OK] go_to_point wp2 (1.00, 0.00, yaw=0.00) — Navigation started",
+                  "[OK] wp2 estado navigating",
+                  "[OK] wp2 concluído (recording)",
+                  "[TRACE] Chamando service stop_record ...",
+                  "[OK] stop_record — Saved 10 poses to routes/tb1/fleet_pilot_tb1.yaml",
+                  "[OK] disable_collection — Collection disabled for tb1. Bag: collections/tb1/2026-10-03_14-19-59_736570_e8019a63",
+                  "",
+                  "Resumo: sem falhas",
+                  "[TRACE] Duração real (parede): 42.24 s  Percurso teórico: 1.0 m",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb1/pose: 5 msgs  ~0.1 Hz",
+                  "  /tb1/odom: 1096 msgs  ~27.8 Hz",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_992be596_baseline.json"
+                ],
+                "result": {
+                  "command": "record",
+                  "robot_id": "tb1",
+                  "route": "fleet_pilot_tb1",
+                  "expected_route_yaml": "routes/tb1/fleet_pilot_tb1.yaml",
+                  "points": [
+                    [
+                      0.5,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      1.0,
+                      0.0,
+                      0.0
+                    ]
+                  ],
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": true,
+                  "failures_reported": 0,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb1. Bag: collections/tb1/2026-10-03_14-19-59_736570_e8019a63",
+                  "rosbag_path": "collections/tb1/2026-10-03_14-19-59_736570_e8019a63",
+                  "sensor_summary": {
+                    "/tb1/pose": {
+                      "msgs": 5,
+                      "hz_est": 0.1
+                    },
+                    "/tb1/odom": {
+                      "msgs": 1096,
+                      "hz_est": 27.8
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 39.42,
+                    "wall_duration_s": 42.24,
+                    "theoretical_path_m": 1.0
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "record",
+                      "--route",
+                      "fleet_pilot_tb1",
+                      "--robot",
+                      "tb1",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--points=0.5,0.0,0.0;1.0,0.0,0.0",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_992be596_baseline.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T14:20:39.214382+00:00",
+                  "git": {
+                    "commit": "56937e84c545aee7bf00bc735a8590adb37b3ad5",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 0
+              },
+              {
+                "label": "replay_01",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route fleet_pilot_tb1 --robot tb1 --topics odom pose --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_992be596_replay_01.json",
+                  "",
+                  "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+                  "robot='tb1' route=fleet_pilot_tb1",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_992be596_replay_01.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb1/2026-10-03_14-20-41_497838_218cd769",
+                  "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+                  "[TRACE] Chamando service play_route ...",
+                  "[FALHOU] play_route — Nav2 follow_waypoints not available",
+                  "[TRACE] Chamando service disable_collection ...",
+                  "[OK] disable_collection — Collection disabled for tb1. Bag: collections/tb1/2026-10-03_14-20-41_497838_218cd769",
+                  "",
+                  "Resumo: 1 falha(s)",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb1/pose: 0 msgs",
+                  "  /tb1/odom: 330 msgs  ~27.9 Hz",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_992be596_replay_01.json"
+                ],
+                "result": {
+                  "command": "replay",
+                  "robot_id": "tb1",
+                  "route": "fleet_pilot_tb1",
+                  "expected_route_yaml": "routes/tb1/fleet_pilot_tb1.yaml",
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": false,
+                  "failures_reported": 1,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb1. Bag: collections/tb1/2026-10-03_14-20-41_497838_218cd769",
+                  "rosbag_path": "collections/tb1/2026-10-03_14-20-41_497838_218cd769",
+                  "sensor_summary": {
+                    "/tb1/pose": {
+                      "msgs": 0,
+                      "hz_est": 0.0
+                    },
+                    "/tb1/odom": {
+                      "msgs": 330,
+                      "hz_est": 27.9
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 11.84
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "replay",
+                      "--route",
+                      "fleet_pilot_tb1",
+                      "--robot",
+                      "tb1",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb1_992be596_replay_01.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T14:20:53.401671+00:00",
+                  "git": {
+                    "commit": "56937e84c545aee7bf00bc735a8590adb37b3ad5",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 1
+              }
+            ],
+            "summary": null,
+            "analysis_log": null,
+            "error": "replay_01 falhou (exit=1): ver lines do passo"
+          }
+        }
+      ],
+      "final_text": "A campanha parou no primeiro replay, então não tenho RMSE para você. Não rodei o `analyze_experiment`.\n\n**O que aconteceu**\n- **Baseline (gravação):** funcionou. A rota `fleet_pilot_tb1` foi salva com 10 poses em `routes/tb1/fleet_pilot_tb1.yaml`, e a bag ficou em `collections/tb1/2026-10-03_14-19-59_736570_e8019a63`. Os dois waypoints (0.5,0) e (1.0,0) foram concluídos em cerca de 42 s.\n- **replay_01:** falhou com `play_route — Nav2 follow_waypoints not available`. O robô não se moveu. A bag tem só odom, 330 msgs, e nenhuma msg de `/tb1/pose`.\n- **replay_02 e replay_03:** não rodaram, porque a campanha abortou após a primeira falha. O campo `summary` veio nulo e nenhuma análise foi gerada.\n\n**Por que não analisei**\n- Sem replays válidos não existe RMSE pareado contra o baseline. Qualquer número seria inventado ou sem sentido.\n- A ferramenta também não devolveu um `run_id` explícito. Só vi o sufixo `992be596` nos nomes dos arquivos exportados, e não quero assumir que ele é o run_id.\n\n**Outros pontos**\n- Durante a gravação apareceu `[FALHOU] TF map->base_link disponível`, embora o resumo diga \"sem falhas\". Pode estar ligado ao problema do Nav2/localização.\n- Fora a rota nova `fleet_pilot_tb1` e as bags desta campanha, não alterei nada. Nenhuma outra rota foi tocada.\n\n**Próximos passos possíveis**\n1. Verificar se o servidor de ação `follow_waypoints` do Nav2 está ativo no tb1 (lifecycle, AMCL e TF map→base_link). Isso precisa ser feito fora das minhas ferramentas.\n2. Depois disso, rodar o replay de novo. Como a rota já existe, não devo usar `run_campaign` com o mesmo nome. Posso usar `run_experiment` com `command: replay`, ou rodar uma campanha nova com outro nome de rota, se você autorizar.\n\nQuer que eu tente algum desses caminhos depois que o Nav2 estiver ok?",
+      "error": null,
+      "instruction": "Use run_campaign com robot=\"tb1\", route=\"fleet_pilot_tb1\" (rota NOVA, nao mexa em outras rotas), points=[[0.5,0,0],[1.0,0,0]], repetitions=3, collect=true, topics=[\"odom\",\"pose\"]. Depois use analyze_experiment pra me dar o RMSE."
+    },
+    "tb2": {
+      "running": false,
+      "steps": [
+        {
+          "tool_name": "get_robot_status",
+          "tool_input": {
+            "robot_id": "tb2"
+          },
+          "result": {
+            "robot_id": "tb2",
+            "role": "MUUT",
+            "nav_state": "idle",
+            "current_route": "",
+            "collection_on": false,
+            "collection_file": "",
+            "last_error": "",
+            "bytes_written": 0,
+            "pose": {
+              "x": 6.911091101391742e-12,
+              "y": -7.12210430930979e-27,
+              "yaw": -1.9819025375177463e-15,
+              "valid": true
+            }
+          }
+        },
+        {
+          "tool_name": "list_routes",
+          "tool_input": {
+            "robot_id": "tb2"
+          },
+          "result": []
+        },
+        {
+          "tool_name": "run_campaign",
+          "tool_input": {
+            "robot": "tb2",
+            "route": "fleet_pilot_tb2",
+            "points": [
+              [
+                0.5,
+                2,
+                0
+              ],
+              [
+                1.0,
+                2,
+                0
+              ]
+            ],
+            "repetitions": 3,
+            "collect": true,
+            "topics": [
+              "odom",
+              "pose"
+            ]
+          },
+          "result": {
+            "running": false,
+            "steps": [
+              {
+                "label": "baseline",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py record --route fleet_pilot_tb2 --robot tb2 --topics odom pose --points=0.5,2.0,0.0;1.0,2.0,0.0 --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_b06f04fb_baseline.json",
+                  "",
+                  "=== Fase A: gravar percurso (coleta + record + waypoints) ===",
+                  "robot='tb2' route=fleet_pilot_tb2 pontos=2",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_b06f04fb_baseline.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb2/2026-10-03_14-19-56_575170_0271d161",
+                  "[TRACE] Chamando service start_record ...",
+                  "[OK] start_record — Recording started",
+                  "[TRACE] Esperando TF map->base_link ...",
+                  "[FALHOU] TF map->base_link disponível",
+                  "[TRACE] Aguardando /map (SLAM) ou settle do costmap (AMCL) ...",
+                  "[INFO] /map não publicado — modo AMCL com mapa pré-carregado (normal)",
+                  "[TRACE] Aguardando costmap processar mapa (3s) ...",
+                  "[TRACE] go_to_point wp1: x=0.500 y=2.000 yaw=0.000",
+                  "[OK] go_to_point wp1 (0.50, 2.00, yaw=0.00) — Navigation started",
+                  "[OK] wp1 estado navigating",
+                  "[OK] wp1 concluído (recording)",
+                  "[TRACE] go_to_point wp2: x=1.000 y=2.000 yaw=0.000",
+                  "[OK] go_to_point wp2 (1.00, 2.00, yaw=0.00) — Navigation started",
+                  "[OK] wp2 estado navigating",
+                  "[OK] wp2 concluído (recording)",
+                  "[TRACE] Chamando service stop_record ...",
+                  "[OK] stop_record — Saved 36 poses to routes/tb2/fleet_pilot_tb2.yaml",
+                  "[OK] disable_collection — Collection disabled for tb2. Bag: collections/tb2/2026-10-03_14-19-56_575170_0271d161",
+                  "",
+                  "Resumo: sem falhas",
+                  "[TRACE] Duração real (parede): 50.8 s  Percurso teórico: 2.562 m",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb2/pose: 15 msgs  ~0.3 Hz",
+                  "  /tb2/odom: 1349 msgs  ~27.8 Hz",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_b06f04fb_baseline.json"
+                ],
+                "result": {
+                  "command": "record",
+                  "robot_id": "tb2",
+                  "route": "fleet_pilot_tb2",
+                  "expected_route_yaml": "routes/tb2/fleet_pilot_tb2.yaml",
+                  "points": [
+                    [
+                      0.5,
+                      2.0,
+                      0.0
+                    ],
+                    [
+                      1.0,
+                      2.0,
+                      0.0
+                    ]
+                  ],
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": true,
+                  "failures_reported": 0,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb2. Bag: collections/tb2/2026-10-03_14-19-56_575170_0271d161",
+                  "rosbag_path": "collections/tb2/2026-10-03_14-19-56_575170_0271d161",
+                  "sensor_summary": {
+                    "/tb2/pose": {
+                      "msgs": 15,
+                      "hz_est": 0.3
+                    },
+                    "/tb2/odom": {
+                      "msgs": 1349,
+                      "hz_est": 27.8
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 48.53,
+                    "wall_duration_s": 50.8,
+                    "theoretical_path_m": 2.562
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "record",
+                      "--route",
+                      "fleet_pilot_tb2",
+                      "--robot",
+                      "tb2",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--points=0.5,2.0,0.0;1.0,2.0,0.0",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_b06f04fb_baseline.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T14:20:45.235337+00:00",
+                  "git": {
+                    "commit": "56937e84c545aee7bf00bc735a8590adb37b3ad5",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 0
+              },
+              {
+                "label": "replay_01",
+                "lines": [
+                  "[CMD] python3 /home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py replay --route fleet_pilot_tb2 --robot tb2 --topics odom pose --export /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_b06f04fb_replay_01.json",
+                  "",
+                  "=== Fase B: reproduzir percurso (coleta + play_route) ===",
+                  "robot='tb2' route=fleet_pilot_tb2",
+                  "topics=['odom', 'pose'] skip_collection=False export='/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_b06f04fb_replay_01.json'",
+                  "[TRACE] Chamando service enable_collection ...",
+                  "[OK] enable_collection — Collection enabled. Bag: collections/tb2/2026-10-03_14-20-46_523448_73a21287",
+                  "[TRACE] Warmup após enable_collection (sleep 5s) ...",
+                  "[TRACE] Chamando service play_route ...",
+                  "[FALHOU] play_route — Nav2 follow_waypoints not available",
+                  "[TRACE] Chamando service disable_collection ...",
+                  "[OK] disable_collection — Collection disabled for tb2. Bag: collections/tb2/2026-10-03_14-20-46_523448_73a21287",
+                  "",
+                  "Resumo: 1 falha(s)",
+                  "",
+                  "[TRACE] Sensor summary (mcap):",
+                  "  /tb2/pose: 0 msgs",
+                  "  /tb2/odom: 343 msgs  ~27.9 Hz",
+                  "[TRACE] bag_metrics: odom=0 msgs  path=0.0000 m  scan=0  imu=0",
+                  "",
+                  "[OK] Resumo exportado: /home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_b06f04fb_replay_01.json"
+                ],
+                "result": {
+                  "command": "replay",
+                  "robot_id": "tb2",
+                  "route": "fleet_pilot_tb2",
+                  "expected_route_yaml": "routes/tb2/fleet_pilot_tb2.yaml",
+                  "topics": [
+                    "odom",
+                    "pose"
+                  ],
+                  "skip_collection": false,
+                  "success": false,
+                  "failures_reported": 1,
+                  "error_code": "",
+                  "path_length_m_estimate": 0.0,
+                  "disable_collection_message": "Collection disabled for tb2. Bag: collections/tb2/2026-10-03_14-20-46_523448_73a21287",
+                  "rosbag_path": "collections/tb2/2026-10-03_14-20-46_523448_73a21287",
+                  "sensor_summary": {
+                    "/tb2/pose": {
+                      "msgs": 0,
+                      "hz_est": 0.0
+                    },
+                    "/tb2/odom": {
+                      "msgs": 343,
+                      "hz_est": 27.9
+                    }
+                  },
+                  "bag_metrics": {
+                    "duration_s": 12.31
+                  },
+                  "protocol_metadata": {
+                    "argv": [
+                      "/home/eduardo/fleet-ui/fleet_ws/scripts/experiment_repeatability.py",
+                      "replay",
+                      "--route",
+                      "fleet_pilot_tb2",
+                      "--robot",
+                      "tb2",
+                      "--topics",
+                      "odom",
+                      "pose",
+                      "--export",
+                      "/home/eduardo/fleet-ui/fleet_ws/_campaign_fleet_pilot_tb2_b06f04fb_replay_01.json"
+                    ]
+                  },
+                  "finished_at": "2026-10-03T14:20:58.870025+00:00",
+                  "git": {
+                    "commit": "56937e84c545aee7bf00bc735a8590adb37b3ad5",
+                    "dirty": true
+                  }
+                },
+                "error": null,
+                "exit_code": 1
+              }
+            ],
+            "summary": null,
+            "analysis_log": null,
+            "error": "replay_01 falhou (exit=1): ver lines do passo"
+          }
+        }
+      ],
+      "final_text": "A campanha parou na primeira repetição, então não há RMSE para informar. Não rodei o `analyze_experiment`: não houve replay válido para comparar, e a campanha não devolveu um `run_id` explícito.\n\n**O que aconteceu**\n- **Baseline (gravação):** funcionou.\n  - Os dois waypoints, (0.5, 2, 0) e (1.0, 2, 0), foram concluídos.\n  - A rota foi salva com 36 poses em `routes/tb2/fleet_pilot_tb2.yaml`.\n  - A coleta gravou `/tb2/odom` (1349 msgs, cerca de 28 Hz) e `/tb2/pose` (15 msgs, cerca de 0,3 Hz).\n  - A duração foi de 50,8 s.\n- **replay_01:** falhou com `play_route — Nav2 follow_waypoints not available`.\n  - O robô não se moveu. A coleta rodou cerca de 12 s só com odom parado, e `/tb2/pose` ficou com 0 msgs.\n  - Como o replay_01 falhou, as repetições 2 e 3 não foram executadas.\n\n**Pontos de atenção**\n- No início da gravação apareceu `[FALHOU] TF map->base_link disponível`. O script continuou, e a navegação dos waypoints funcionou mesmo assim. Pode ser um problema de timing do TF ou da localização AMCL.\n- O baseline mostrou `odom=0 msgs path=0.0000 m` em `bag_metrics`, embora o mcap tenha 1349 msgs de odom. Esse cálculo de métricas parece inconsistente e pode afetar o RMSE depois.\n\n**Estado atual**\n- A rota `fleet_pilot_tb2` existe e é válida.\n- Não toquei em nenhuma outra rota nem em outro robô.\n- O baseline e o replay_01 falho ficaram gravados em `collections/tb2/...`.\n\n**Próximos passos**\n1. Verifique o servidor de ação `follow_waypoints` do Nav2 no tb2. Ele provavelmente não subiu, ou o nome do servidor está diferente.\n2. Depois disso, posso rodar só os replays com `run_experiment` (`command: replay`), sem regravar a rota. Também posso refazer a campanha inteira com outro nome de rota, já que a atual agora existe.\n\nQuer que eu tente rodar o replay de novo depois que você checar o Nav2?",
+      "error": null,
+      "instruction": "Use run_campaign com robot=\"tb2\", route=\"fleet_pilot_tb2\" (rota NOVA, nao mexa em outras rotas), points=[[0.5,2,0],[1.0,2,0]], repetitions=3, collect=true, topics=[\"odom\",\"pose\"]. Depois use analyze_experiment pra me dar o RMSE."
+    }
+  },
+  "model": "claude-sonnet-5-5",
+  "started_at": "2026-10-03T14:19:43.862604+00:00",
+  "finished_at": "2026-10-03T14:21:09.915521+00:00"
+}

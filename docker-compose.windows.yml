@@ -1,0 +1,35 @@
+services:
+  app:
+    image: fleet-ui:dev
+    build:
+      context: .
+    environment:
+      ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-0}
+      # Everything (sim, fleet nodes, backend) runs in this single container,
+      # so DDS discovery never needs to leave loopback. Multicast discovery
+      # under Docker Desktop's virtualized network was flaky on first boot
+      # (topics matched in `ros2 topic info -v` but no messages arrived until
+      # a manual `docker compose restart`); restricting to localhost avoids
+      # that path entirely.
+      ROS_LOCALHOST_ONLY: ${ROS_LOCALHOST_ONLY:-1}
+      # 2 robôs por padrão (tb1,tb2) — os 3 juntos deixam o Nav2 instável sob
+      # carga de CPU nesta máquina (não é falta de GPU, ver orquestracion.md).
+      # FLEET_ROBOTS=tb1,tb2,tb3 volta pros 3.
+      FLEET_ROBOTS: ${FLEET_ROBOTS:-tb1,tb2}
+      WORLD: ${WORLD:-warehouse}
+      # false: a simulação não sobe sozinha no boot — use o painel "Missão
+      # Coordenada" (POST /api/simulation/start) pra não competir com ele por
+      # portas/tópicos. true = volta ao boot automático antigo.
+      AUTOSTART_SIM: ${AUTOSTART_SIM:-false}
+      FLEET_START_DELAY: ${FLEET_START_DELAY:-90}
+      BACKEND_START_DELAY: ${BACKEND_START_DELAY:-30}
+      FLEET_CORS_ORIGINS: ${FLEET_CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    ports:
+      - "5173:5173"
+      - "8000:8000"
+    volumes:
+      - ./fleet_ws/routes:/workspace/fleet_ws/routes
+      - ./fleet_ws/collections:/workspace/fleet_ws/collections
+      - ./frontend/public:/workspace/frontend/public
+    command: ["/workspace/docker/run-all-headless-multi.sh"]

@@ -1,0 +1,31 @@
+# colcon
+build/
+install/
+log/
+
+# dados gravados (rotas e bags)
+routes/
+collections/
+runs_history/
+
+# relatórios locais do script diagnose_nav_fleet.sh
+diagnostics/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# job export files from backend
+_job_*.json
+
+# resultados de experimentos (gerados pelo analyze_runs.py)
+analysis_*/
+graficos_dissertacao/

@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!-- Fork de nav2_minimal_tb4_description/urdf/icreate/sensors/imu.urdf.xacro.
+     Única mudança: usa o parâmetro `namespace` (já existia, mas era dead
+     plumbing no original) para prefixar o tópico gz `imu` por robô. -->
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+<xacro:macro name="imu_sensor" params="name:=imu gazebo namespace parent:=base_link update_rate:=200 *origin">
+
+  <xacro:property name="imu_prefix" value="${'/' + namespace if namespace else ''}"/>
+
+  <joint name="${name}_joint" type="fixed">
+    <xacro:insert_block name="origin"/>
+    <parent link="${parent}"/>
+    <child link="${name}_link"/>
+  </joint>
+
+  <link name="${name}_link">
+      <xacro:inertial_dummy />
+  </link>
+
+  <gazebo reference="${name}_link">
+    <sensor type="imu" name="${name}">
+      <always_on>true</always_on>
+      <update_rate>${update_rate}</update_rate>
+      <topic>${imu_prefix}/imu</topic>
+      <imu>
+        <angular_velocity>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.0</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.0</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.0</stddev>
+            </noise>
+          </z>
+        </angular_velocity>
+        <linear_acceleration>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.0</stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.0</stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.0</stddev>
+            </noise>
+          </z>
+        </linear_acceleration>
+      </imu>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="${name}_joint">
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+
+</xacro:macro>
+</robot>

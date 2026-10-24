@@ -1,0 +1,161 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm --prefix frontend ci
+
+      - name: Python syntax checks
+        run: |
+          python3 -m py_compile \
+            backend/main.py \
+            backend/ros_bridge.py \
+            backend/agents/executor.py \
+            backend/agents/analyst.py \
+            backend/agents/planner.py \
+            backend/agents/tools.py \
+            fleet_ws/scripts/health_check.py \
+            fleet_ws/scripts/experiment_repeatability.py \
+            fleet_ws/scripts/analyze_runs.py \
+            fleet_ws/scripts/robot_preflight.py \
+            fleet_ws/src/fleet_orchestrator/fleet_orchestrator/main.py \
+            fleet_ws/src/fleet_data_collector/fleet_data_collector/main.py
+
+      - name: Install Python analysis dependencies
+        # backend/requirements.txt tem fastapi/uvicorn/websockets/pyyaml/httpx/
+        # anthropic; numpy é só pro analyze_runs.py, não está no requirements.txt
+        # do backend. A lista antiga aqui (numpy httpx anthropic) esquecia
+        # fastapi — os testes que importam backend/main.py (test_agent_persistence,
+        # test_agents_executor, test_campaign_endpoint) vinham falhando de
+        # verdade nos últimos runs de CI por isso, não só pulando.
+        run: python3 -m pip install -r backend/requirements.txt numpy
+
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests
+
+      - name: Frontend build
+        run: npm --prefix frontend run build
+
+      - name: Frontend unit tests
+        run: npm --prefix frontend test
+
+      - name: Frontend E2E (Playwright, API mockada)
+        run: |
+          cd frontend
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+
+  ros-checks:
+    # Este ambiente NÃO tem ROS 2/Nav2/xacro/launch — o job "checks" acima
+    # roda a suíte inteira, mas os testes guardados por HAS_ROS (ver
+    # `tests/test_xacro_multirobot.py`, `test_fleet_orchestrator_logic.py`,
+    # `test_multi_sim_launch_structure.py`) apenas pulam lá, silenciosamente.
+    # Badge verde nesse job só prova que a metade sem-ROS do projeto
+    # funciona — os bugs reais de multi-robô desta sessão estavam todos do
+    # outro lado. Este job roda dentro de um container com ROS 2 Jazzy de
+    # verdade, faz colcon build, valida xacro/URDF de cada robô e os launch
+    # files, e falha explicitamente se algum teste ROS for pulado — do
+    # contrário, se o ROS instalado aqui algum dia ficar incompleto/errado,
+    # os testes voltam a "skip" silenciosamente e o badge mentiria nesse job
+    # também.
+    runs-on: ubuntu-24.04
+    container:
+      image: osrf/ros:jazzy-desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar pacotes ROS usados pelo fleet_orchestrator/data_collector
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            python3-colcon-common-extensions \
+            python3-pip \
+            ros-jazzy-nav2-bringup \
+            ros-jazzy-nav2-minimal-tb4-sim \
+            ros-jazzy-nav2-minimal-tb4-description \
+            ros-jazzy-turtlebot4-simulator \
+            ros-jazzy-slam-toolbox \
+            ros-jazzy-rosbag2-py \
+            ros-jazzy-xacro \
+            ros-jazzy-urdfdom
+          # Mesmo esquecimento do job "checks" (fastapi faltando) também
+          # existia aqui, numa lista manual separada — corrigido do mesmo
+          # jeito: instalar de backend/requirements.txt (+ numpy).
+          pip3 install --break-system-packages -r backend/requirements.txt numpy
+
+      - name: colcon build (fleet_msgs, fleet_orchestrator, fleet_data_collector)
+        run: |
+          . /opt/ros/jazzy/setup.sh
+          cd fleet_ws
+          colcon build --symlink-install
+          # Nesta combinação de versões de colcon/ament_package, pacotes
+          # ament_python puros (fleet_orchestrator, fleet_data_collector) não
+          # ganham o hook ament_prefix_path automaticamente — sem ele,
+          # AMENT_PREFIX_PATH nunca inclui install/fleet_orchestrator e
+          # ament_index_python.get_package_share_directory("fleet_orchestrator")
+          # falha (mesmo com o build tendo "funcionado"). Script já existia no
+          # repo (fleet_ws/fix_ament_hooks.sh) como workaround conhecido —
+          # só faltava chamá-lo aqui.
+          bash fix_ament_hooks.sh
+
+      - name: Validar xacro + URDF por robô (namespace vazio, tb1, tb2, tb3)
+        # Pega exatamente o bug real desta sessão: com namespace:=tb1 os
+        # tópicos gz-transport do TurtleBot4 vazavam sem prefixo (cmd_vel
+        # global). xacro sozinho não pegaria isso pela sintaxe — mas se o
+        # xacro falhar ao expandir ou o URDF resultante for inválido para
+        # QUALQUER robô, isso já é sinal de regressão grave no fork.
+        run: |
+          . /opt/ros/jazzy/setup.sh
+          . fleet_ws/install/setup.sh
+          for ns in "" tb1 tb2 tb3; do
+            label="${ns:-default}"
+            echo "=== namespace='${ns}' (${label}) ==="
+            xacro fleet_ws/src/fleet_orchestrator/urdf/tb4/standard/turtlebot4.urdf.xacro \
+              namespace:="${ns}" > "/tmp/robot_${label}.urdf"
+            check_urdf "/tmp/robot_${label}.urdf"
+          done
+
+      - name: Validar que os launch files multi-robô importam/geram descrição
+        run: |
+          . /opt/ros/jazzy/setup.sh
+          . fleet_ws/install/setup.sh
+          for f in turtlebot4_sim.launch.py turtlebot4_multi_sim.launch.py \
+                   spawn_multi_tb4.launch.py fleet.launch.py; do
+            echo "=== $f ==="
+            ros2 launch fleet_orchestrator "$f" --show-args
+          done
+
+      - name: Testes ROS (xacro, lógica do orquestrador, estrutura do launch) — sem skip
+        run: |
+          . /opt/ros/jazzy/setup.sh
+          . fleet_ws/install/setup.sh
+          OUTPUT=$(python3 -m unittest \
+            tests.test_xacro_multirobot \
+            tests.test_fleet_orchestrator_logic \
+            tests.test_multi_sim_launch_structure \
+            -v 2>&1)
+          echo "$OUTPUT"
+          if echo "$OUTPUT" | grep -q "skipped="; then
+            echo "::error::Teste(s) ROS pulados mesmo com ROS 2 instalado neste job — ambiente ROS incompleto/quebrado, não é o caso normal de 'sem ROS'. Ver saída acima."
+            exit 1
+          fi
+
+      - name: Suíte completa (com ROS disponível de verdade)
+        run: |
+          . /opt/ros/jazzy/setup.sh
+          . fleet_ws/install/setup.sh
+          python3 -m unittest discover -s tests

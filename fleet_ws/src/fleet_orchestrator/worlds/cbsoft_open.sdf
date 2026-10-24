@@ -1,0 +1,914 @@
+<?xml version="1.0"?>
+<!-- Gerado por fleet_ws/scripts/cbsoft/gen_open_world.py — não editar à mão. -->
+<sdf version="1.6" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="headless" default="true"/>
+  <world name="cbsoft_open">
+    <scene><grid>false</grid></scene>
+    <physics name="1ms" type="ode">
+      <max_step_size>0.003</max_step_size>
+      <real_time_update_rate>1000.0</real_time_update_rate>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <!-- Sempre, mesmo headless: publica /world/<w>/dynamic_pose/info, de onde
+         sai o ground truth (ground_truth_pose_clean). Os mundos do vendor só o
+         carregam com GUI. -->
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+
+    <light type="directional" name="sun">
+      <cast_shadows>false</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>200 200</size></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>200 200</size></plane></geometry>
+          <material><ambient>0.8 0.8 0.8 1</ambient><diffuse>0.8 0.8 0.8 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="wall_south">
+      <static>true</static>
+      <pose>-16.000 -56.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>52.200 0.200 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>52.200 0.200 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_north">
+      <static>true</static>
+      <pose>-16.000 26.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>52.200 0.200 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>52.200 0.200 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_west">
+      <static>true</static>
+      <pose>-42.000 -15.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.200 82.200 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.200 82.200 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="wall_east">
+      <static>true</static>
+      <pose>10.000 -15.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.200 82.200 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.200 82.200 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_000">
+      <static>true</static>
+      <pose>-40.000 -54.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_001">
+      <static>true</static>
+      <pose>-40.000 -47.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_002">
+      <static>true</static>
+      <pose>-40.000 -40.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_003">
+      <static>true</static>
+      <pose>-40.000 -33.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_004">
+      <static>true</static>
+      <pose>-40.000 -26.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_005">
+      <static>true</static>
+      <pose>-40.000 -19.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_006">
+      <static>true</static>
+      <pose>-40.000 -12.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_007">
+      <static>true</static>
+      <pose>-40.000 -5.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_008">
+      <static>true</static>
+      <pose>-40.000 2.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_009">
+      <static>true</static>
+      <pose>-40.000 9.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_010">
+      <static>true</static>
+      <pose>-40.000 16.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_011">
+      <static>true</static>
+      <pose>-40.000 23.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_012">
+      <static>true</static>
+      <pose>-33.000 -54.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_013">
+      <static>true</static>
+      <pose>-33.000 -40.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_014">
+      <static>true</static>
+      <pose>-33.000 -33.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_015">
+      <static>true</static>
+      <pose>-33.000 -26.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_016">
+      <static>true</static>
+      <pose>-33.000 -19.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_017">
+      <static>true</static>
+      <pose>-33.000 -12.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_018">
+      <static>true</static>
+      <pose>-33.000 -5.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_019">
+      <static>true</static>
+      <pose>-33.000 2.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_020">
+      <static>true</static>
+      <pose>-33.000 9.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_021">
+      <static>true</static>
+      <pose>-33.000 16.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_022">
+      <static>true</static>
+      <pose>-33.000 23.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_023">
+      <static>true</static>
+      <pose>-26.000 -54.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_024">
+      <static>true</static>
+      <pose>-26.000 -40.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_025">
+      <static>true</static>
+      <pose>-26.000 -33.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_026">
+      <static>true</static>
+      <pose>-26.000 -26.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_027">
+      <static>true</static>
+      <pose>-26.000 -19.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_028">
+      <static>true</static>
+      <pose>-26.000 -12.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_029">
+      <static>true</static>
+      <pose>-26.000 -5.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_030">
+      <static>true</static>
+      <pose>-26.000 2.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_031">
+      <static>true</static>
+      <pose>-26.000 9.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_032">
+      <static>true</static>
+      <pose>-26.000 16.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_033">
+      <static>true</static>
+      <pose>-26.000 23.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_034">
+      <static>true</static>
+      <pose>-19.000 -54.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_035">
+      <static>true</static>
+      <pose>-19.000 -40.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_036">
+      <static>true</static>
+      <pose>-19.000 -33.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_037">
+      <static>true</static>
+      <pose>-19.000 -26.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_038">
+      <static>true</static>
+      <pose>-19.000 -19.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_039">
+      <static>true</static>
+      <pose>-19.000 -12.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_040">
+      <static>true</static>
+      <pose>-19.000 -5.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_041">
+      <static>true</static>
+      <pose>-19.000 2.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_042">
+      <static>true</static>
+      <pose>-19.000 9.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_043">
+      <static>true</static>
+      <pose>-19.000 16.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_044">
+      <static>true</static>
+      <pose>-19.000 23.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_045">
+      <static>true</static>
+      <pose>-12.000 -54.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_046">
+      <static>true</static>
+      <pose>-12.000 -40.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_047">
+      <static>true</static>
+      <pose>-12.000 -33.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_048">
+      <static>true</static>
+      <pose>-12.000 -26.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_049">
+      <static>true</static>
+      <pose>-12.000 -19.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_050">
+      <static>true</static>
+      <pose>-12.000 -12.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_051">
+      <static>true</static>
+      <pose>-12.000 -5.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_052">
+      <static>true</static>
+      <pose>-12.000 2.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_053">
+      <static>true</static>
+      <pose>-12.000 9.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_054">
+      <static>true</static>
+      <pose>-12.000 16.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_055">
+      <static>true</static>
+      <pose>-12.000 23.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_056">
+      <static>true</static>
+      <pose>-5.000 -54.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_057">
+      <static>true</static>
+      <pose>-5.000 -40.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_058">
+      <static>true</static>
+      <pose>-5.000 -33.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_059">
+      <static>true</static>
+      <pose>-5.000 -26.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_060">
+      <static>true</static>
+      <pose>-5.000 -19.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_061">
+      <static>true</static>
+      <pose>-5.000 -12.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_062">
+      <static>true</static>
+      <pose>-5.000 -5.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_063">
+      <static>true</static>
+      <pose>-5.000 2.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_064">
+      <static>true</static>
+      <pose>-5.000 9.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_065">
+      <static>true</static>
+      <pose>-5.000 16.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_066">
+      <static>true</static>
+      <pose>-5.000 23.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_067">
+      <static>true</static>
+      <pose>2.000 -54.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_068">
+      <static>true</static>
+      <pose>2.000 -47.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_069">
+      <static>true</static>
+      <pose>2.000 -40.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_070">
+      <static>true</static>
+      <pose>2.000 -33.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_071">
+      <static>true</static>
+      <pose>2.000 -26.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_072">
+      <static>true</static>
+      <pose>2.000 -19.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_073">
+      <static>true</static>
+      <pose>2.000 -12.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pillar_074">
+      <static>true</static>
+      <pose>2.000 23.000 0.500 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.300 0.300 1.000</size></box></geometry></collision>
+        <visual name="visual">
+          <geometry><box><size>0.300 0.300 1.000</size></box></geometry>
+          <material><ambient>0.6 0.6 0.65 1</ambient><diffuse>0.6 0.6 0.65 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

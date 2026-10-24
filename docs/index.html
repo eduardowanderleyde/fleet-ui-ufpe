@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fleet UI — TurtleBot4 Fleet Interface</title>
+  <meta name="description" content="Web interface for operating a TurtleBot4 fleet in simulation. Record navigation routes, replay them, and measure trajectory repeatability." />
+  <style>
+    /* ── Reset & base ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #30363d;
+      --accent:    #2f81f7;
+      --accent2:   #3fb950;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --code-bg:   #1f2428;
+      --radius:    8px;
+      --max:       1100px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { max-width: 100%; display: block; }
+
+    /* ── Layout helpers ─────────────────────────────────────── */
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+    section { padding: 80px 0; }
+    section + section { border-top: 1px solid var(--border); }
+    h2 { font-size: 1.75rem; margin-bottom: 12px; }
+    h3 { font-size: 1.15rem; margin-bottom: 8px; color: var(--text); }
+    p  { color: var(--muted); }
+    .label {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      padding: 2px 10px;
+      margin-bottom: 14px;
+    }
+
+    /* ── Nav ────────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,17,23,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+    }
+    nav .inner {
+      max-width: var(--max); margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    nav .logo { font-weight: 700; font-size: 1.05rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    nav .logo span { color: var(--accent); }
+    nav ul { list-style: none; display: flex; gap: 28px; }
+    nav ul a { color: var(--muted); font-size: .9rem; }
+    nav ul a:hover { color: var(--text); text-decoration: none; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border-radius: var(--radius);
+      font-size: .9rem; font-weight: 600; cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .85; text-decoration: none; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost   { background: transparent; color: var(--text); border: 1px solid var(--border); }
+
+    /* ── Hero ───────────────────────────────────────────────── */
+    #hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    #hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    #hero h1 em { font-style: normal; color: var(--accent); }
+    #hero p.sub {
+      font-size: 1.15rem;
+      max-width: 620px;
+      margin: 0 auto 36px;
+      color: var(--muted);
+    }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+    .badge {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 14px;
+      font-size: .78rem; color: var(--muted);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-blue   { background: var(--accent); }
+    .dot-green  { background: var(--accent2); }
+    .dot-orange { background: #d29922; }
+
+    /* Hero screenshot */
+    .hero-img {
+      margin: 56px auto 0;
+      max-width: 900px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 64px rgba(0,0,0,.6);
+    }
+    .placeholder {
+      background: var(--surface);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px;
+      color: var(--muted); font-size: .85rem;
+      text-align: center; padding: 20px;
+    }
+    .placeholder .icon { font-size: 2.5rem; opacity: .4; }
+    .placeholder strong { color: var(--text); font-size: .95rem; }
+
+    /* ── Features ───────────────────────────────────────────── */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+    .card .icon-big { font-size: 2rem; margin-bottom: 14px; }
+    .card p { font-size: .9rem; margin-top: 6px; }
+
+    /* ── Architecture ───────────────────────────────────────── */
+    .arch {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .arch-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: relative;
+    }
+    .arch-card .term {
+      position: absolute; top: 14px; right: 14px;
+      font-size: .72rem; font-weight: 700;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 4px; padding: 2px 8px;
+      color: var(--muted);
+    }
+    .arch-card .num {
+      font-size: 2rem; font-weight: 800;
+      color: var(--border); line-height: 1;
+      margin-bottom: 12px;
+    }
+    .arch-card h3 { color: var(--accent); }
+    .arch-card p { font-size: .85rem; margin-top: 6px; }
+    .arch-card .port {
+      display: inline-block; margin-top: 12px;
+      font-size: .75rem; font-family: monospace;
+      background: var(--bg); border: 1px solid var(--border);
+      padding: 2px 8px; border-radius: 4px; color: var(--accent2);
+    }
+
+    /* ── Screenshots ────────────────────────────────────────── */
+    .shots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .shot { display: flex; flex-direction: column; gap: 12px; }
+    .shot-img {
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      aspect-ratio: 16/9;
+      background: var(--surface);
+    }
+    .shot-img img { width: 100%; height: 100%; object-fit: cover; }
+    .shot-img .placeholder { height: 100%; border: none; border-radius: 0; }
+    .shot h3 { font-size: .95rem; }
+    .shot p  { font-size: .83rem; }
+
+    /* ── Steps ──────────────────────────────────────────────── */
+    .steps { margin-top: 48px; display: flex; flex-direction: column; gap: 32px; }
+    .step { display: grid; grid-template-columns: 48px 1fr; gap: 24px; align-items: start; }
+    .step-num {
+      width: 48px; height: 48px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.1rem; flex-shrink: 0;
+    }
+    .step-body h3 { margin-bottom: 8px; }
+    .step-body p  { margin-bottom: 12px; font-size: .9rem; }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      overflow-x: auto;
+      font-size: .83rem;
+      line-height: 1.6;
+    }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    pre code { color: #e6edf3; }
+    .comment { color: #8b949e; }
+    .cmd     { color: #79c0ff; }
+    .str     { color: #a5d6ff; }
+    .kw      { color: #ff7b72; }
+
+    /* Four terminals */
+    .terminals {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .terminal {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .terminal-bar {
+      background: var(--surface);
+      padding: 8px 14px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: .78rem; color: var(--muted);
+    }
+    .terminal-bar .dots { display: flex; gap: 6px; }
+    .terminal-bar .dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .t-red    { background: #ff5f57; }
+    .t-yellow { background: #ffbd2e; }
+    .t-green  { background: #28ca41; }
+    .terminal pre {
+      border: none; border-radius: 0; margin: 0;
+      font-size: .78rem; padding: 14px 16px;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+    }
+    footer p { font-size: .85rem; color: var(--muted); }
+    footer .links { display: flex; gap: 20px; justify-content: center; margin-top: 14px; }
+    footer .links a { color: var(--muted); font-size: .85rem; }
+    footer .links a:hover { color: var(--text); }
+
+    @media (max-width: 768px) {
+      nav ul { display: none; }
+    }
+    @media (max-width: 640px) {
+      section { padding: 56px 0; }
+      .step { grid-template-columns: 1fr; }
+      .step-num { width: 36px; height: 36px; font-size: .9rem; }
+      .terminals { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ──────────────────────────────────────────────────── -->
+<nav>
+  <div class="inner">
+    <div class="logo">🤖 <span>Fleet</span> UI</div>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#screenshots">Screenshots</a></li>
+      <li><a href="#quickstart">Quick Start</a></li>
+    </ul>
+    <a class="btn btn-ghost" href="https://github.com/eduardowanderleyde/fleet-ui" target="_blank" rel="noopener noreferrer">
+      ★ GitHub
+    </a>
+  </div>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="container">
+    <div class="badges">
+      <span class="badge"><span class="dot dot-blue"></span>ROS 2 Jazzy</span>
+      <span class="badge"><span class="dot dot-green"></span>TurtleBot4</span>
+      <span class="badge"><span class="dot dot-orange"></span>Gazebo Harmonic</span>
+      <span class="badge"><span class="dot dot-blue"></span>Nav2</span>
+      <span class="badge"><span class="dot dot-green"></span>FastAPI + React</span>
+    </div>
+
+    <h1>
+      Autonomous Navigation<br/>
+      <em>Record. Replay. Measure.</em>
+    </h1>
+
+    <p class="sub">
+      A web interface for operating a TurtleBot4 fleet in simulation.
+      Click waypoints on a live SLAM map, record routes with full sensor data,
+      replay them N times, and automatically compute trajectory repeatability metrics.
+    </p>
+
+    <div class="hero-btns">
+      <a class="btn btn-primary" href="#quickstart">Get Started</a>
+      <a class="btn btn-ghost" href="https://github.com/eduardowanderleyde/fleet-ui" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+    </div>
+
+    <div class="hero-img">
+      <img src="assets/screenshots/FLEET1.jpeg" alt="Fleet UI — full interface with SLAM map, waypoints and live output" />
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ─────────────────────────────────────────────── -->
+<section id="features">
+  <div class="container">
+    <div class="label">Features</div>
+    <h2>Everything in one interface</h2>
+    <p>From waypoint placement to RMSE analysis — without touching the terminal.</p>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon-big">🗺️</div>
+        <h3>Live SLAM Map</h3>
+        <p>The SLAM Toolbox map streams in real-time to the browser. Click to place waypoints and visualise the robot pose as it moves.</p>
+      </div>
+      <div class="card">
+        <div class="icon-big">🔴</div>
+        <h3>Route Recording</h3>
+        <p>Start recording, drive the robot to your waypoints, stop — the route is saved as a YAML file with poses captured at 5 Hz via TF.</p>
+      </div>
+      <div class="card">
+        <div class="icon-big">▶️</div>
+        <h3>Repeatable Replay</h3>
+        <p>Load any saved route and replay it N times. Nav2 follows the exact waypoint sequence while sensor data is collected in MCAP bags.</p>
+      </div>
+      <div class="card">
+        <div class="icon-big">📊</div>
+        <h3>Repeatability Metrics</h3>
+        <p>Automatic RMSE computation between runs, trajectory overlay plots, pairwise distance matrices, and 95% confidence intervals.</p>
+      </div>
+      <div class="card">
+        <div class="icon-big">📡</div>
+        <h3>Sensor Collection</h3>
+        <p>LiDAR, odometry, and IMU data recorded into MCAP (rosbag2) during every run — ready for offline analysis and comparison.</p>
+      </div>
+      <div class="card">
+        <div class="icon-big">🤖</div>
+        <h3>Multi-robot Ready</h3>
+        <p>Designed with robot roles (MUUT, FUUT, SU) and namespace support. Run in single-robot simulation or extend to a real fleet.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Architecture ─────────────────────────────────────────── -->
+<section id="architecture">
+  <div class="container">
+    <div class="label">Architecture</div>
+    <h2>Four processes, one system</h2>
+    <p>Start them in order. Terminal 1 takes ~12 s to be ready.</p>
+
+    <div style="margin-top:48px; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border); background:#fff; padding:24px;">
+      <img src="assets/screenshots/FLEET3.jpeg" alt="Fleet UI architecture diagram" style="width:100%; display:block;" />
+    </div>
+
+    <div class="arch" style="margin-top:24px;">
+      <div class="arch-card">
+        <span class="term">Terminal 1</span>
+        <div class="num">01</div>
+        <h3>Simulation</h3>
+        <p>Gazebo Harmonic spawns the TurtleBot4. SLAM Toolbox starts at 8 s, Nav2 at 12 s.</p>
+        <code class="port">Gazebo :11345</code>
+      </div>
+      <div class="arch-card">
+        <span class="term">Terminal 2</span>
+        <div class="num">02</div>
+        <h3>Fleet Nodes</h3>
+        <p><code>fleet_orchestrator</code> handles route record/play via Nav2. <code>sensor_collector</code> writes MCAP bags.</p>
+        <code class="port">ROS 2 DDS</code>
+      </div>
+      <div class="arch-card">
+        <span class="term">Terminal 3</span>
+        <div class="num">03</div>
+        <h3>Backend</h3>
+        <p>FastAPI bridges ROS 2 topics and services to the web UI via REST and WebSocket (250 ms updates).</p>
+        <code class="port">:8000</code>
+      </div>
+      <div class="arch-card">
+        <span class="term">Terminal 4</span>
+        <div class="num">04</div>
+        <h3>Frontend</h3>
+        <p>React + Vite renders the map, waypoint editor, live status panel, and experiment controls.</p>
+        <code class="port">:5173</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Screenshots ───────────────────────────────────────────── -->
+<section id="screenshots">
+  <div class="container">
+    <div class="label">Screenshots</div>
+    <h2>See it in action</h2>
+    <p>The full pipeline from simulation to analysis.</p>
+
+    <div class="shots">
+
+      <div class="shot">
+        <div class="shot-img">
+          <img src="assets/screenshots/FLEET1.jpeg" alt="Fleet UI with SLAM map and waypoints" />
+        </div>
+        <h3>Waypoint Editor</h3>
+        <p>Click the live SLAM map to place waypoints. The robot navigates them in sequence.</p>
+      </div>
+
+      <div class="shot">
+        <div class="shot-img">
+          <img src="assets/screenshots/FLEET2.jpeg" alt="Recording in progress with live output" />
+        </div>
+        <h3>Route Recording</h3>
+        <p>Live nav state, pose coordinates, and collection status update every 250 ms.</p>
+      </div>
+
+      <div class="shot">
+        <div class="shot-img">
+          <img src="assets/warehouse_map.png" alt="Warehouse map background" />
+        </div>
+        <h3>Warehouse World</h3>
+        <p>Pre-loaded static map of the warehouse environment used as navigation background.</p>
+      </div>
+
+      <div class="shot">
+        <div class="shot-img">
+          <img src="assets/screenshots/FLEET3.jpeg" alt="Fleet UI system architecture" style="object-fit:contain; background:#fff;" />
+        </div>
+        <h3>System Architecture</h3>
+        <p>Full data flow from Gazebo simulation through ROS 2 nodes to the web interface.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Quick Start ───────────────────────────────────────────── -->
+<section id="quickstart">
+  <div class="container">
+    <div class="label">Quick Start</div>
+    <h2>Up and running in minutes</h2>
+    <p>Ubuntu 24.04 + ROS 2 Jazzy required.</p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Install prerequisites</h3>
+          <p>ROS 2 simulation packages and Python backend dependencies.</p>
+          <pre><code><span class="comment"># ROS 2 simulation packages</span>
+<span class="cmd">sudo apt install</span> <span class="str">\
+  ros-jazzy-nav2-minimal-tb4-sim \
+  ros-jazzy-turtlebot4-navigation \
+  ros-jazzy-tf2-ros ros-jazzy-tf2-py</span>
+
+<span class="comment"># Python backend</span>
+<span class="cmd">sudo apt install</span> <span class="str">\
+  python3-fastapi python3-uvicorn \
+  python3-websockets python3-yaml</span>
+
+<span class="comment"># Node.js frontend</span>
+<span class="cmd">sudo apt install</span> <span class="str">nodejs npm</span></code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Clone and build</h3>
+          <p>⚠️ Path must be ASCII only — avoid accented letters (e.g. <code>~/Músicas/</code>).</p>
+          <pre><code><span class="cmd">git clone</span> https://github.com/eduardowanderleyde/fleet-ui ~/fleet-ui
+<span class="cmd">cd</span> ~/fleet-ui
+<span class="cmd">bash</span> build.sh          <span class="comment"># colcon build + fix_ament_hooks</span>
+<span class="cmd">cd</span> frontend <span class="kw">&amp;&amp;</span> <span class="cmd">npm install</span></code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Open 4 terminals</h3>
+          <p>Start them in order. Wait for <em>"All BT navigator servers are active"</em> before Terminal 2.</p>
+
+          <div class="terminals">
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="dots"><span class="t-red"></span><span class="t-yellow"></span><span class="t-green"></span></div>
+                Terminal 1 — Simulation
+              </div>
+              <pre><code><span class="cmd">cd</span> ~/fleet-ui/fleet_ws
+<span class="cmd">source</span> /opt/ros/jazzy/setup.bash
+<span class="cmd">source</span> install/setup.bash
+<span class="cmd">ros2 launch</span> fleet_orchestrator \
+  turtlebot4_sim.launch.py</code></pre>
+            </div>
+
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="dots"><span class="t-red"></span><span class="t-yellow"></span><span class="t-green"></span></div>
+                Terminal 2 — Fleet Nodes
+              </div>
+              <pre><code><span class="cmd">cd</span> ~/fleet-ui/fleet_ws
+<span class="cmd">source</span> /opt/ros/jazzy/setup.bash
+<span class="cmd">source</span> install/setup.bash
+<span class="cmd">ros2 launch</span> fleet_orchestrator \
+  fleet.launch.py \
+  single_robot_sim:=true</code></pre>
+            </div>
+
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="dots"><span class="t-red"></span><span class="t-yellow"></span><span class="t-green"></span></div>
+                Terminal 3 — Backend
+              </div>
+              <pre><code><span class="cmd">source</span> /opt/ros/jazzy/setup.bash
+<span class="cmd">source</span> ~/fleet-ui/fleet_ws/install/setup.bash
+<span class="cmd">cd</span> ~/fleet-ui/backend
+<span class="cmd">python3</span> main.py</code></pre>
+            </div>
+
+            <div class="terminal">
+              <div class="terminal-bar">
+                <div class="dots"><span class="t-red"></span><span class="t-yellow"></span><span class="t-green"></span></div>
+                Terminal 4 — Frontend
+              </div>
+              <pre><code><span class="cmd">cd</span> ~/fleet-ui/frontend
+<span class="cmd">npm run dev</span>
+
+<span class="comment"># Open in browser:</span>
+<span class="str">http://localhost:5173</span></code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Record your first route</h3>
+          <p>Open <code>http://localhost:5173</code> in your browser, place waypoints on the map, and click <strong>Executar → record</strong>. The robot navigates and saves the route automatically.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <p>Built with ROS 2 Jazzy · Gazebo Harmonic · Nav2 · FastAPI · React</p>
+    <div class="links">
+      <a href="https://github.com/eduardowanderleyde/fleet-ui">GitHub</a>
+      <a href="https://github.com/eduardowanderleyde/fleet-ui/blob/main/README.md">README</a>
+      <a href="https://github.com/eduardowanderleyde/fleet-ui/issues">Issues</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

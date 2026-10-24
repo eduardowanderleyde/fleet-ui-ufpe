@@ -1,0 +1,6 @@
+# Cancel current navigation for one robot
+string robot_id
+---
+bool success
+string message
+string error_code

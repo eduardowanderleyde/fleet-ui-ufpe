@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roteiro do Teste no CIn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: checklist de bancada em coluna única; cada fase do dia é um bloco, cada passo tem caixa para marcar, comando e o que se espera ver. */
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --ink: #14202b; --muted: #566573; --line: #d9e0e6;
+  --signal: #0a63c9; --signal-soft: #e3eefb; --weak: #c2410c; --weak-soft: #fdebe1; --ok: #157347; --ok-soft: #e3f4ea;
+  --code-bg: #0f1a24; --code-ink: #dbe7f2;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d151c; --surface: #15212b; --ink: #e6edf3; --muted: #9aabba; --line: #263644;
+    --signal: #5aa6f5; --signal-soft: #132b44; --weak: #f08a55; --weak-soft: #3a2116; --ok: #4cc38a; --ok-soft: #12301f;
+    --code-bg: #091017; --code-ink: #d6e4f0; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d151c; --surface: #15212b; --ink: #e6edf3; --muted: #9aabba; --line: #263644;
+  --signal: #5aa6f5; --signal-soft: #132b44; --weak: #f08a55; --weak-soft: #3a2116; --ok: #4cc38a; --ok-soft: #12301f;
+  --code-bg: #091017; --code-ink: #d6e4f0; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 1rem; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 4rem;
+}
+.wrap { max-width: 820px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(1.9rem, 5vw, 2.7rem); letter-spacing: -0.02em; }
+h2 { font-size: 1.3rem; }
+p { margin: 0; max-width: 68ch; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--signal-soft); padding: 0.06em 0.32em; border-radius: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+header { padding-block: 2.5rem 1.5rem; display: grid; gap: 0.8rem; }
+header p { color: var(--muted); font-size: 1.05rem; }
+.progress { display: flex; align-items: center; gap: 0.75rem; font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+.bar { flex: 1; height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; max-width: 320px; }
+.bar i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .2s; }
+
+.stop { border: 1.5px solid var(--weak); background: var(--weak-soft); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.4rem; margin-bottom: 1.5rem; }
+.stop h2 { font-size: 1.05rem; color: var(--weak); }
+.stop ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.2rem; }
+
+section.phase { padding-block: 1.25rem 0.5rem; border-top: 1px solid var(--line); display: grid; gap: 0.75rem; }
+.phase-head { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+.phase-head .when { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--signal); }
+
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; counter-reset: step var(--start, 0); }
+ol.steps > li { counter-increment: step; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 0.9rem; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.25rem 0.8rem; }
+ol.steps > li > label { display: contents; cursor: pointer; }
+.box { grid-row: span 2; display: grid; justify-items: center; gap: 0.2rem; }
+.box input { width: 1.25rem; height: 1.25rem; accent-color: var(--ok); margin: 0.1rem 0 0; }
+.box .num { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+.box .num::before { content: counter(step); }
+.what { font-weight: 600; }
+.detail { display: grid; gap: 0.45rem; min-width: 0; color: var(--ink); }
+.detail p { color: var(--muted); }
+li.done { border-color: var(--ok); background: var(--ok-soft); }
+li.done .what { text-decoration: line-through; text-decoration-color: var(--ok); }
+
+.cmd { position: relative; background: var(--code-bg); color: var(--code-ink); border-radius: 8px; min-width: 0; }
+.cmd pre { margin: 0; padding: 2.1rem 0.9rem 0.75rem; overflow-x: auto; font-family: var(--mono); font-size: 0.82rem; line-height: 1.5; }
+.cmd .c { color: #7f95a8; }
+.cmd button { position: absolute; top: 0.4rem; right: 0.4rem; font: 500 0.72rem var(--body); color: var(--code-ink); background: transparent; border: 1px solid #34495c; border-radius: 6px; padding: 0.2rem 0.55rem; cursor: pointer; }
+.cmd button:focus-visible { outline: 2px solid var(--code-ink); }
+.expect { font-size: 0.88rem; border-left: 3px solid var(--ok); padding-left: 0.6rem; color: var(--ink); }
+.expect b { color: var(--ok); }
+
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+th, td { text-align: left; padding: 0.45rem 0.65rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { color: var(--muted); font-weight: 600; font-size: 0.76rem; }
+tbody tr:last-child td { border-bottom: 0; }
+td:first-child { white-space: nowrap; font-family: var(--mono); font-size: 0.8rem; }
+
+footer { border-top: 1px solid var(--line); margin-top: 2rem; padding-top: 1rem; color: var(--muted); font-size: 0.86rem; display: grid; gap: 0.35rem; }
+.reset { justify-self: start; font: 500 0.8rem var(--body); color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 0.3rem 0.7rem; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media (max-width: 520px) { ol.steps > li { grid-template-columns: 1fr; } .box { grid-row: auto; grid-auto-flow: column; justify-content: start; align-items: center; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">Fleet UI · teste BLE com o TurtleBot4 real · CIn-UFPE</span>
+  <h1>Roteiro do teste no CIn</h1>
+  <p>Do dia anterior até guardar os dados, na ordem. Marquem cada passo quando ele der certo; só sigam para o próximo com o anterior marcado. Os detalhes de instalação estão no manual.</p>
+  <div class="progress"><span id="count">0 de 0</span><div class="bar"><i id="fill"></i></div></div>
+</header>
+
+<div class="stop" role="note">
+  <h2>Parem tudo se</h2>
+  <ul>
+    <li>o robô sair do percurso, se aproximar de uma pessoa ou de um obstáculo: parada física primeiro (segurar ou levantar o robô), tela depois;</li>
+    <li>a checagem do passo 9 tiver qualquer <b>FALHA</b>;</li>
+    <li>a tela mostrar <b>Nav2 OFF</b> ou a posição do robô no mapa não bater com onde ele está.</li>
+  </ul>
+  <p>O botão <b>■ Parar</b> da tela cancela a navegação, mas o robô ainda anda cerca de 3 s (uns 80 cm) até parar.</p>
+</div>
+
+<section class="phase">
+  <div class="phase-head"><span class="when">Antes do dia</span><h2>No PC do laboratório</h2></div>
+  <ol class="steps" style="--start: 0">
+    <li><label><span class="box"><input type="checkbox" id="s1"><span class="num"></span></span><span class="what">Docker instalado e funcionando sem sudo</span></label>
+      <div class="detail"><p>Passo 1 do manual.</p><div class="cmd"><button type="button">Copiar</button><pre>docker run hello-world</pre></div><p class="expect"><b>Esperado:</b> a mensagem “Hello from Docker!”.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s2"><span class="num"></span></span><span class="what">Fleet UI baixado e montado</span></label>
+      <div class="detail"><p>Passo 2 do manual (repositório ou o arquivo <code>.zip</code>). A montagem leva de 15 a 30 minutos: façam com antecedência.</p><div class="cmd"><button type="button">Copiar</button><pre>cd ~/fleet-ui
+make docker-build</pre></div><p class="expect"><b>Esperado:</b> termina com “Image fleet-ui:dev Built”.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s3"><span class="num"></span></span><span class="what">Uma corrida completa na simulação</span></label>
+      <div class="detail"><p>Confirma que tudo funciona nessa máquina antes de envolver o robô.</p><div class="cmd"><button type="button">Copiar</button><pre>make cbsoft-up       <span class="c"># abrir http://localhost:5173, Conectar, ▶ Executar replay</span>
+make docker-down     <span class="c"># depois de Ctrl+C, para desligar</span></pre></div><p class="expect"><b>Esperado:</b> “Sucesso”, cerca de 96 m e 0,25 m/s no canto direito da tela.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s4"><span class="num"></span></span><span class="what">Material separado</span></label>
+      <div class="detail"><p>Robô carregado na base, os dois celulares carregados e pareados, PC Windows com o script de leitura BLE de sempre.</p></div></li>
+  </ol>
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="when">No laboratório</span><h2>Robô e rede</h2></div>
+  <ol class="steps" style="--start: 4">
+    <li><label><span class="box"><input type="checkbox" id="s5"><span class="num"></span></span><span class="what">Robô ligado e iniciado</span></label>
+      <div class="detail"><p>Esperem o robô terminar de iniciar, como vocês já fazem.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s6"><span class="num"></span></span><span class="what">PC e robô na mesma rede</span></label>
+      <div class="detail"><p>O robô se conecta ao PC pelo Wi-Fi, sozinho, sem botão: basta o Raspberry Pi do robô e o PC estarem na mesma rede. Dentro do robô, a base Create3 fala com o Raspberry Pi pelo cabo USB-C, como já está configurado. O ROS encontra o robô porque os dois lados usam o mesmo domínio (0) e o mesmo middleware (CycloneDDS); o passo 9 confirma.</p><div class="cmd"><button type="button">Copiar</button><pre>ping &lt;IP do robô&gt;</pre></div><p class="expect"><b>Esperado:</b> respostas com tempo, sem “Destination Host Unreachable”.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s7"><span class="num"></span></span><span class="what">Nav2 de vocês desligado</span></label>
+      <div class="detail"><p>O Nav2 do contêiner de vocês é Humble e não conversa com o do Fleet UI. Se ele estiver ligado:</p><div class="cmd"><button type="button">Copiar</button><pre>docker stop ttb4</pre></div></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s8"><span class="num"></span></span><span class="what">Relógio do robô igual ao do PC</span></label>
+      <div class="detail"><p>O mesmo comando do guia de troubleshooting de vocês:</p><div class="cmd"><button type="button">Copiar</button><pre>ssh ubuntu@&lt;IP do robô&gt; "sudo date -s '@$(date +%s.%N)'"</pre></div></div></li>
+  </ol>
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="when">Antes de mover</span><h2>Checagem pré-voo</h2></div>
+  <ol class="steps" style="--start: 8">
+    <li><label><span class="box"><input type="checkbox" id="s9"><span class="num"></span></span><span class="what">Checagem toda OK</span></label>
+      <div class="detail"><p>Só escuta o robô, não publica nada.</p><div class="cmd"><button type="button">Copiar</button><pre>cd ~/fleet-ui
+make robot-check</pre></div><p class="expect"><b>Esperado:</b> “Tudo certo: pode subir o fleet-ui contra o robô.” Se alguma linha der FALHA:</p>
+      <div class="tablebox"><table>
+        <thead><tr><th>Linha</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>middleware</td><td>O robô precisa estar em CycloneDDS: <code>RMW_IMPLEMENTATION=rmw_cyclonedds_cpp</code> em <code>/etc/turtlebot4/setup.bash</code> e na base Create3, como no guia de vocês. Depois, <code>sudo systemctl restart turtlebot4.service</code> no robô.</td></tr>
+          <tr><td>nós descobertos</td><td>Rede ou domínio. Se o robô não usa o domínio 0: <code>make robot-check ROBOT_DOMAIN=&lt;n&gt;</code> (e o mesmo número no <code>robot-up</code>).</td></tr>
+          <tr><td>relógio</td><td>Repetir o passo 8.</td></tr>
+          <tr><td>TF odom → base_link</td><td>No robô: <code>sudo systemctl restart turtlebot4.service</code> (erro 1 do guia de vocês).</td></tr>
+          <tr><td>taxa /scan ou /odom</td><td>Laser ou base sem publicar: reiniciar o serviço do robô, como acima.</td></tr>
+          <tr><td>Nav2 já rodando (aviso)</td><td>Repetir o passo 7.</td></tr>
+        </tbody>
+      </table></div></div></li>
+  </ol>
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="when">Ligar</span><h2>Fleet UI no robô</h2></div>
+  <ol class="steps" style="--start: 9">
+    <li><label><span class="box"><input type="checkbox" id="s10"><span class="num"></span></span><span class="what">Robô no START</span></label>
+      <div class="detail"><p>Coloquem o robô no ponto de partida de sempre, virado para a mesma direção das corridas de vocês.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s11"><span class="num"></span></span><span class="what">Fleet UI ligado no robô</span></label>
+      <div class="detail"><p>Deixem esse terminal aberto. Em cerca de 1 minuto, abram <code>http://localhost:5173</code>.</p><div class="cmd"><button type="button">Copiar</button><pre>make robot-up</pre></div></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s12"><span class="num"></span></span><span class="what">Tela confere com o robô</span></label>
+      <div class="detail"><p class="expect"><b>Esperado:</b> no alto da tela, <b>Nav2 ON</b> e posição perto de x = 1,02 e y = 16,62 (o START).</p><p>Se o robô estiver em outro lugar, informem a posição real: na tela, campo <b>Pose inicial</b> (ela é enviada ao AMCL no começo da execução, como o “2D Pose Estimate” do RViz), ou religuem com <code>make robot-up X_POSE=… Y_POSE=… YAW=…</code>.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s13"><span class="num"></span></span><span class="what">Conectar a tela</span></label>
+      <div class="detail"><p><b>Conectar robô</b> → <b>Custom (simulação local)</b> → <b>Conectar</b>. O nome diz “simulação”, mas essa opção só confirma que a tela fala com o servidor do próprio PC, que agora está ligado ao robô real.</p></div></li>
+  </ol>
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="when">Primeiro movimento</span><h2>Teste curto</h2></div>
+  <ol class="steps" style="--start: 13">
+    <li><label><span class="box"><input type="checkbox" id="s14"><span class="num"></span></span><span class="what">Andar 1 metro</span></label>
+      <div class="detail"><p>Com espaço livre e alguém perto do robô: em <b>Gravar</b>, cliquem no mapa cerca de 1 m à frente do robô e usem <b>→ Navegar rota</b>, que anda sem gravar.</p><p class="expect"><b>Esperado:</b> o robô anda até o ponto e para; o campo Nav volta para <b>idle</b>.</p></div></li>
+  </ol>
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="when">A corrida</span><h2>Teste BLE</h2></div>
+  <ol class="steps" style="--start: 14">
+    <li><label><span class="box"><input type="checkbox" id="s15"><span class="num"></span></span><span class="what">Celulares no lugar</span></label>
+      <div class="detail"><p>Um fixo no START, o outro em cima do robô, conectados, como nas corridas de vocês. O Fleet UI não mexe no Bluetooth: a conexão entre os celulares e a leitura do sinal continuam do jeito de sempre, fora dele. O botão <b>Conectar robô</b> da tela não tem relação com Bluetooth.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s16"><span class="num"></span></span><span class="what">Leitura BLE começando no PC Windows</span></label>
+      <div class="detail"><p>Antes, confiram que o relógio do PC Windows está no horário automático e no fuso de Recife: a análise casa o sinal com a posição pelo horário.</p><div class="cmd"><button type="button">Copiar</button><pre>.\script_celular.ps1</pre></div></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s17"><span class="num"></span></span><span class="what">Executar o percurso</span></label>
+      <div class="detail"><p>Na tela: <b>Reproduzir</b>, rota <code>percurso_cbsoft</code>, <b>Gravar bag</b> marcado, <b>▶ Executar replay</b>. Na lista de tópicos, deixem <code>ble_rssi</code> <b>desmarcado</b>: é um recurso opcional que leria o Bluetooth pelo PC Linux e não foi testado com o robô real.</p><p class="expect"><b>Esperado:</b> o robô segue o “L” (64 m e depois 31 m), a cerca de 0,25 m/s.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s18"><span class="num"></span></span><span class="what">Parar na desconexão</span></label>
+      <div class="detail"><p>Quando o script do Windows registrar a desconexão, parem a corrida com <b>■ Parar</b> na tela e o script com Ctrl+C, como vocês faziam com os dois terminais.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s19"><span class="num"></span></span><span class="what">Log do celular copiado</span></label>
+      <div class="detail"><p>Copiem o log do Windows para <code>fleet_ws/collections/cbsoft/nrf/</code> no PC do Fleet UI.</p></div></li>
+  </ol>
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="when">Depois de cada corrida</span><h2>Análise e nova corrida</h2></div>
+  <ol class="steps" style="--start: 19">
+    <li><label><span class="box"><input type="checkbox" id="s20"><span class="num"></span></span><span class="what">Gráfico de RSSI gerado</span></label>
+      <div class="detail"><div class="cmd"><button type="button">Copiar</button><pre>make cbsoft-csv
+make cbsoft-analise NAV=collections/cbsoft/&lt;navegacao&gt;.csv NRF="collections/cbsoft/nrf/&lt;log&gt;.txt"</pre></div><p class="expect"><b>Esperado:</b> um PNG ao lado do CSV, com o RSSI ao longo da posição.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s21"><span class="num"></span></span><span class="what">Robô de volta ao START para a próxima</span></label>
+      <div class="detail"><p>Levem o robô ao START, parem o terminal do passo 11 com Ctrl+C e rodem <code>make robot-up</code> de novo, para a posição recomeçar no START. Depois, voltem ao passo 15.</p></div></li>
+  </ol>
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="when">No fim</span><h2>Encerrar e guardar</h2></div>
+  <ol class="steps" style="--start: 21">
+    <li><label><span class="box"><input type="checkbox" id="s22"><span class="num"></span></span><span class="what">Tudo desligado e robô na base</span></label>
+      <div class="detail"><div class="cmd"><button type="button">Copiar</button><pre>make docker-down</pre></div></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s23"><span class="num"></span></span><span class="what">Dados copiados para outro lugar</span></label>
+      <div class="detail"><p>Copiem a pasta <code>fleet_ws/collections/</code> inteira (gravações, CSVs, logs e gráficos) para um pendrive ou para a nuvem antes de sair.</p></div></li>
+  </ol>
+</section>
+
+<footer>
+  <p>Até agora, a ligação com o robô foi testada com um robô falso, que publica laser, odometria e TF como o TurtleBot4: checagem OK, Nav2 ativo, deslocamento de 1 m concluído e parada no meio do percurso funcionando. Esta é a primeira vez com o robô de verdade.</p>
+  <p>Fleet UI, repositório <code>fleet-ui-ufpe</code>. Dúvidas: falem com o Eduardo.</p>
+  <button type="button" class="reset" id="reset">Desmarcar tudo</button>
+</footer>
+
+</div>
+<script>
+(function () {
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('ol.steps input[type=checkbox]'));
+  var KEY = 'roteiro-cin-v1';
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+  function update() {
+    var done = 0;
+    boxes.forEach(function (b) {
+      b.closest('li').classList.toggle('done', b.checked);
+      if (b.checked) done++;
+    });
+    document.getElementById('count').textContent = done + ' de ' + boxes.length;
+    document.getElementById('fill').style.width = (100 * done / boxes.length) + '%';
+  }
+  boxes.forEach(function (b) {
+    b.checked = !!saved[b.id];
+    b.addEventListener('change', function () {
+      saved[b.id] = b.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+      update();
+    });
+  });
+  document.getElementById('reset').addEventListener('click', function () {
+    boxes.forEach(function (b) { b.checked = false; });
+    saved = {};
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    update();
+  });
+  update();
+
+  document.querySelectorAll('.cmd button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var pre = btn.parentElement.querySelector('pre');
+      var text = pre.innerText.replace(/\s+#.*$/gm, '');
+      var label = function (t) { btn.textContent = t; setTimeout(function () { btn.textContent = 'Copiar'; }, 1600); };
+      var select = function () { var r = document.createRange(); r.selectNodeContents(pre); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { label('Copiado'); }, function () { select(); label('Selecionado'); });
+      } else { select(); label('Selecionado'); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

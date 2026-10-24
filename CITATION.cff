@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: >-
+  Se você usar este software ou o protocolo experimental que ele implementa,
+  por favor cite-o usando os metadados abaixo.
+title: "fleet-ui: plataforma de experimento para repetibilidade de navegação multi-robô (TurtleBot4/ROS 2/Nav2)"
+type: software
+authors:
+  - given-names: Eduardo
+    family-names: Wanderley
+repository-code: "https://github.com/eduardowanderleyde/fleet-ui"
+license: MIT
