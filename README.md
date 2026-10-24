@@ -8,6 +8,10 @@ scripts de análise de RSSI já estão integrados.
 Experimento original: "Wireless Connectivity Testing with Mobile Robots: A
 Bluetooth Low Energy Case Study", CBSoft 2026.
 
+![Demonstração: a tela abre no percurso, conecta, executa o replay e termina com Sucesso (96,2 m a 0,248 m/s)](docs/ufpe/demo.gif)
+
+*Demonstração real a partir de um clone limpo deste repositório: abrir, conectar e executar o percurso na simulação (6,6 min, acelerado).*
+
 ## Comece por aqui
 
 | Documento | Para quê |
