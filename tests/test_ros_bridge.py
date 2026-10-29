@@ -37,6 +37,22 @@ class RosBridgeCommandTests(unittest.TestCase):
         self.assertIn("odom", cmd)
         self.assertIn("--points=1,2,0;3,4,1.57", cmd)
 
+    def test_real_robot_keeps_selected_topics(self):
+        # Com o robô real (relógio do sistema), a gravação ainda precisa dos
+        # tópicos da tela: sem amcl_pose, o cbsoft-csv não tem posição.
+        with patch.dict("os.environ", {"FLEET_USE_SIM_TIME": "false"}):
+            cmd = self.bridge.build_experiment_cmd({
+                "command": "replay",
+                "robot": "default",
+                "route": "percurso_cbsoft",
+                "collect": True,
+                "topics": ["scan", "odom", "amcl_pose"],
+            })
+
+        self.assertIn("--no-use-sim-time", cmd)
+        self.assertIn("--topics", cmd)
+        self.assertIn("amcl_pose", cmd)
+
     def test_replay_command_keeps_robot_and_return_to_start(self):
         cmd = self.bridge.build_experiment_cmd({
             "command": "replay",
