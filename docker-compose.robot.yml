@@ -33,6 +33,8 @@ services:
       # mesmos parâmetros do serviço sim acima.
       FLEET_ROBOT_MODE: ${FLEET_ROBOT_MODE:-false}
       ROBOT_IP: ${ROBOT_IP:-}
+      # Ao conectar, o robô gira ~10° e volta (robot_wiggle.py); false desliga.
+      ROBOT_CONNECT_WIGGLE: ${ROBOT_CONNECT_WIGGLE:-true}
       ROBOT_MAP: ${ROBOT_MAP:-hall_cin_v4}
       X_POSE: ${X_POSE:-1.0216323137283325}
       Y_POSE: ${Y_POSE:-16.61626625061035}

@@ -92,9 +92,11 @@ robot-check:
 #   make robot-up ROBOT_IP=192.168.50.11
 # Plano B, o jeito antigo (tudo sobe já no terminal, sem o painel):
 #   make robot-check && make robot-up-terminal
+# Ao conectar, o robô gira ~10° e volta, no lugar (ROBOT_CONNECT_WIGGLE=false desliga).
 ROBOT_IP ?=
+ROBOT_CONNECT_WIGGLE ?= true
 ROBOT_ENV = ROS_DOMAIN_ID=$(ROBOT_DOMAIN) RMW_IMPLEMENTATION=$(ROBOT_RMW) TZ=$(TZ_LOCAL) \
-	NAV2_CONTROLLER=$(NAV2_CONTROLLER) ROBOT_IP=$(ROBOT_IP)
+	NAV2_CONTROLLER=$(NAV2_CONTROLLER) ROBOT_IP=$(ROBOT_IP) ROBOT_CONNECT_WIGGLE=$(ROBOT_CONNECT_WIGGLE)
 ROBOT_COMPOSE = $(COMPOSE) -f docker-compose.yml -f docker-compose.robot.yml
 
 robot-up:

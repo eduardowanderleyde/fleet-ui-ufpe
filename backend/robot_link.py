@@ -39,6 +39,7 @@ _PROCESS_PATTERNS = (
 )
 
 PREFLIGHT_TIMEOUT_S = 60
+SIGNAL_TIMEOUT_S = 15
 REACH_TIMEOUT_S = 2.0
 MAX_LINES = 300
 
@@ -99,9 +100,16 @@ def launch_commands(env: dict) -> list[tuple[str, list[str]]]:
     return [("robot", robot), ("fleet", fleet)]
 
 
+def signal_enabled(env: dict) -> bool:
+    """Giro de "conectado" (robot_wiggle.py), ligado por padrão.
+    ROBOT_CONNECT_WIGGLE=false desliga."""
+    return (env.get("ROBOT_CONNECT_WIGGLE") or "true").strip().lower() not in ("false", "0", "no")
+
+
 def _idle_state() -> dict:
+    # signal: None (ainda não), "sending", "ok", "failed" ou "off".
     return {"phase": "idle", "ip": None, "message": "", "checks": [], "lines": [],
-            "clock_command": None, "started_at": None}
+            "clock_command": None, "started_at": None, "signal": None}
 
 
 class RobotLink:
@@ -134,6 +142,8 @@ class RobotLink:
                     and self._nav_ready(state["started_at"])):
                 self._state["phase"] = state["phase"] = "ready"
                 self._state["message"] = state["message"] = "Robô conectado: Nav2 ativo."
+                self._begin_signal()
+                state["signal"] = self._state["signal"]
             if state["phase"] in ("starting", "ready") and any(p.poll() is not None for _, p in self._procs):
                 self._state["phase"] = state["phase"] = "error"
                 self._state["message"] = state["message"] = (
@@ -232,6 +242,30 @@ class RobotLink:
             line = raw.rstrip()
             if line:
                 self._append(tag, line)
+
+    # ── sinal de conectado ────────────────────────────────────────────────
+    def _begin_signal(self) -> None:
+        """Chamado com o lock, na passagem para ready: um giro por conexão."""
+        if not signal_enabled(self._ros_env()):
+            self._state["signal"] = "off"
+            return
+        self._state["signal"] = "sending"
+        threading.Thread(target=self._send_signal, daemon=True).start()
+
+    def _send_signal(self) -> None:
+        script = os.path.join(self._ros_ws, "scripts", "robot_wiggle.py")
+        try:
+            result = subprocess.run(
+                ["bash", "-c", self._setup_prefix() + f"python3 {shlex.quote(script)}"],
+                capture_output=True, text=True, timeout=SIGNAL_TIMEOUT_S,
+                cwd=self._ros_ws, env={**self._ros_env(), "PYTHONUNBUFFERED": "1"},
+            )
+            ok = result.returncode == 0
+            detail = (result.stdout or result.stderr or "").strip().splitlines()[-1:] or [""]
+        except subprocess.TimeoutExpired:
+            ok, detail = False, ["o giro não terminou a tempo"]
+        self._append("sinal", detail[0])
+        self._set(signal="ok" if ok else "failed")
 
     # ── desconectar ───────────────────────────────────────────────────────
     def disconnect(self) -> None:

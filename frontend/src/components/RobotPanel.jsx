@@ -17,6 +17,13 @@ const PHASE = {
   error:    { label: '✗ Não conectou', color: color.danger },
 }
 
+// Giro de "conectado" (backend/robot_link.py → robot_wiggle.py).
+const SIGNAL = {
+  sending: { label: '↺ Girando um pouquinho para sinalizar…', color: color.warning },
+  ok:      { label: '↺ O robô girou um pouquinho: conexão confirmada.', color: color.success },
+  failed:  { label: '⚠ O giro de sinal não foi enviado (veja as linhas abaixo).', color: color.warning },
+}
+
 const MARK = {
   ok:   { icon: '✓', color: color.success },
   warn: { icon: '⚠', color: color.warning },
@@ -68,7 +75,7 @@ export default function RobotPanel({ link }) {
   const busy = pending || status.phase === 'checking' || status.phase === 'starting'
   const active = status.phase !== 'idle'
   const ipValid = /^\d{1,3}(\.\d{1,3}){3}$/.test(ip.trim())
-  const showLog = (status.phase === 'starting' || status.phase === 'error') && status.lines.length > 0
+  const showLog = (status.phase === 'starting' || status.phase === 'error' || status.signal === 'failed') && status.lines.length > 0
 
   return (
     <section aria-label="Robô real" style={S.box}>
@@ -106,6 +113,7 @@ export default function RobotPanel({ link }) {
         <div role="status" style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
           {phase.label && <span style={{ fontSize: '0.8rem', fontWeight: 600, color: phase.color }}>{phase.label}</span>}
           {status.message && <span style={{ fontSize: '0.74rem', color: color.textMuted2 }}>{status.message}</span>}
+          {SIGNAL[status.signal] && <span style={{ fontSize: '0.72rem', color: SIGNAL[status.signal].color }}>{SIGNAL[status.signal].label}</span>}
         </div>
       )}
 

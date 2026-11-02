@@ -53,6 +53,11 @@ describe('RobotPanel', () => {
     expect(l.disconnect).toHaveBeenCalledTimes(1)
   })
 
+  it('mostra quando o robô girou para confirmar a conexão', () => {
+    render(<RobotPanel link={link({ status: { phase: 'ready', message: 'ok', checks: [], lines: [], clock_command: 'x', signal: 'ok' } })} />)
+    expect(screen.getByText(/girou um pouquinho/i)).toBeInTheDocument()
+  })
+
   it('durante a checagem não deixa clicar de novo', () => {
     render(<RobotPanel link={link({ status: { phase: 'checking', message: 'Procurando…', checks: [], lines: [], clock_command: null } })} />)
     expect(screen.getByRole('button', { name: /aguarde/i })).toBeDisabled()

@@ -2,6 +2,7 @@ import contextlib
 import io
 import socket
 import sys
+import threading
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -34,6 +35,20 @@ class FakeProc:
 
     def poll(self):
         return 0 if self.dead else None
+
+
+class WiggleTests(unittest.TestCase):
+    def test_only_turns_in_place_and_comes_back(self):
+        import robot_wiggle as rw
+        steps = rw.phases(0.4, 0.4)
+        self.assertEqual([round(w, 2) for w, _ in steps], [0.4, -0.4, 0.0])
+        self.assertAlmostEqual(sum(w * t for w, t in steps), 0.0)
+
+    def test_speed_and_time_are_capped(self):
+        import robot_wiggle as rw
+        (w, t), *_ = rw.phases(5.0, 10.0)
+        self.assertLessEqual(w, rw.MAX_SPEED)
+        self.assertLessEqual(t, rw.MAX_SECONDS)
 
 
 class HelperTests(unittest.TestCase):
@@ -82,6 +97,8 @@ class RobotLinkTests(unittest.TestCase):
         self.started = []
         patch.object(self.link, "_start_processes", side_effect=lambda: self.started.append(True)).start()
         patch.object(self.link, "_stop_processes").start()
+        # O giro de verdade precisa de ROS; os testes que olham para ele trocam de novo.
+        patch.object(self.link, "_send_signal").start()
         self.addCleanup(patch.stopall)
 
     def connect_and_wait(self, ip="192.168.50.11"):
@@ -122,6 +139,35 @@ class RobotLinkTests(unittest.TestCase):
         self.assertEqual(self.link.status()["phase"], "starting")  # orquestrador ainda não
         self.link._append("fleet", "[INFO] fleet_orchestrator ready robots=['']")
         self.assertEqual(self.link.status()["phase"], "ready")
+
+    def test_ready_sends_the_connect_signal_once(self):
+        text, code = preflight_output([rp.Check("middleware", True, "rmw_cyclonedds_cpp")])
+        with patch.object(rl, "check_reachable", return_value=(True, "ok")), \
+             patch.object(self.link, "_run_preflight", return_value=(text, code)):
+            self.connect_and_wait()
+        with patch.object(self.link, "_send_signal") as send:
+            self.nav_ready = True
+            self.link._append("fleet", "fleet_orchestrator ready")
+            first = self.link.status()
+            self.link.status()
+            for t in list(threading.enumerate()):
+                if t is not threading.current_thread() and t.daemon:
+                    t.join(timeout=1)
+        self.assertEqual(first["phase"], "ready")
+        self.assertEqual(first["signal"], "sending")
+        send.assert_called_once()
+
+    def test_connect_signal_can_be_turned_off(self):
+        self.link._ros_env = lambda: {"ROBOT_CONNECT_WIGGLE": "false"}
+        text, code = preflight_output([rp.Check("middleware", True, "rmw_cyclonedds_cpp")])
+        with patch.object(rl, "check_reachable", return_value=(True, "ok")), \
+             patch.object(self.link, "_run_preflight", return_value=(text, code)):
+            self.connect_and_wait()
+        with patch.object(self.link, "_send_signal") as send:
+            self.nav_ready = True
+            self.link._append("fleet", "fleet_orchestrator ready")
+            self.assertEqual(self.link.status()["signal"], "off")
+        send.assert_not_called()
 
     def test_dead_process_turns_into_error(self):
         text, code = preflight_output([rp.Check("middleware", True, "rmw_cyclonedds_cpp")])
