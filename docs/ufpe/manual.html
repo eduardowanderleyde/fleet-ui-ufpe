@@ -321,6 +321,8 @@ make robot-up ROBOT_IP=192.168.50.11   <span class="c"># o IP do robô, não o d
   <div class="body">
     <h2>Se algo der errado</h2>
     <details><summary>“permission denied” ao rodar docker</summary><div class="in"><p>O usuário ainda não está no grupo <code>docker</code>. Saiam da sessão e entrem de novo depois do <code>usermod</code> do passo 1.</p></div></details>
+    <details><summary>O terminal repete “Network is unreachable” sem parar</summary><div class="in"><p>A rede do notebook mudou com a simulação ligada (por exemplo, trocar para a TurtleLab, que não tem internet). Com o <code>git pull</code> desta versão o Gazebo não reclama mais, mas o ROS ainda perde a comunicação quando a rede muda. Conectem o notebook na rede em que vão ficar <b>antes</b> de ligar a simulação; se ela mudar no meio, parem com Ctrl+C e rodem:</p><div class="cmd"><button type="button">Copiar</button><pre>make docker-down
+make cbsoft-up</pre></div></div></details>
     <details><summary>O terminal repete “list of world names” sem parar</summary><div class="in"><p>O servidor do Gazebo caiu na subida. Parem com Ctrl+C e rodem:</p><div class="cmd"><button type="button">Copiar</button><pre>make docker-down
 make cbsoft-up</pre></div></div></details>
     <details><summary>A página em localhost:5173 não abre</summary><div class="in"><p>Esperem o terminal do passo 3 mostrar o servidor pronto (cerca de 1 min). Se a porta estiver ocupada por outro programa, fechem esse programa e subam de novo.</p></div></details>

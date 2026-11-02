@@ -11,6 +11,11 @@ x-fleet-common: &fleet-common
     # Obs.: os SIGBUS (exit 135 / -7) vistos em 2026-10-22 eram erro de
     # hardware da máquina de dev (MCE no kernel), não isto — ver memory.md.
     FASTDDS_BUILTIN_TRANSPORTS: UDPv4
+    # Gazebo (gz-transport) só pela interface local: ele escolhe a placa de
+    # rede ao ligar e, se o Wi-Fi muda com a simulação rodando (ex.: trocar
+    # para a rede do robô, sem internet), inunda o log com "Exception sending
+    # a multicast message: Network is unreachable" (~80 por segundo).
+    GZ_IP: ${GZ_IP:-127.0.0.1}
     WORLD: ${WORLD:-warehouse}
     LOCALIZATION: ${LOCALIZATION:-slam}
     HEADLESS: ${HEADLESS:-False}
