@@ -105,7 +105,7 @@ footer { border-top: 1px solid var(--line); margin-top: 2rem; padding-top: 1rem;
   <h2>Parem tudo se</h2>
   <ul>
     <li>o robô sair do percurso, se aproximar de uma pessoa ou de um obstáculo: parada física primeiro (segurar ou levantar o robô), tela depois;</li>
-    <li>a checagem do passo 9 tiver qualquer <b>FALHA</b>;</li>
+    <li>a checagem do passo 11 tiver qualquer <b>FALHA</b>;</li>
     <li>a tela mostrar <b>Nav2 OFF</b> ou a posição do robô no mapa não bater com onde ele está.</li>
   </ul>
   <p>O botão <b>■ Parar</b> da tela cancela a navegação, mas o robô ainda anda cerca de 3 s (uns 80 cm) até parar.</p>
@@ -133,45 +133,41 @@ make docker-down     <span class="c"># depois de Ctrl+C, para desligar</span></p
     <li><label><span class="box"><input type="checkbox" id="s5"><span class="num"></span></span><span class="what">Robô ligado e iniciado</span></label>
       <div class="detail"><p>Esperem o robô terminar de iniciar, como vocês já fazem.</p></div></li>
     <li><label><span class="box"><input type="checkbox" id="s6"><span class="num"></span></span><span class="what">PC e robô na mesma rede</span></label>
-      <div class="detail"><p>O robô se conecta ao PC pelo Wi-Fi, sozinho, sem botão: basta o Raspberry Pi do robô e o PC estarem na mesma rede. Dentro do robô, a base Create3 fala com o Raspberry Pi pelo cabo USB-C, como já está configurado. O ROS encontra o robô porque os dois lados usam o mesmo domínio (0) e o mesmo middleware (CycloneDDS); o passo 9 confirma.</p><div class="cmd"><button type="button">Copiar</button><pre>ping &lt;IP do robô&gt;</pre></div><p class="expect"><b>Esperado:</b> respostas com tempo, sem “Destination Host Unreachable”.</p></div></li>
+      <div class="detail"><p>Conectem o PC no Wi-Fi <b>TurtleLab</b>, o do roteador portátil. Essa rede <b>não tem internet</b>: <code>git pull</code> e <code>make docker-build</code> têm de ser feitos antes, em outra rede.</p><p>O robô é o <code>192.168.50.11</code>; o <code>192.168.50.1</code> é o roteador. Se o IP mudar, ele aparece na telinha do robô ou em <code>http://192.168.50.1</code>, na lista de aparelhos conectados.</p><div class="cmd"><button type="button">Copiar</button><pre>ping 192.168.50.11</pre></div><p class="expect"><b>Esperado:</b> respostas com tempo, sem “Destination Host Unreachable”.</p></div></li>
     <li><label><span class="box"><input type="checkbox" id="s7"><span class="num"></span></span><span class="what">Nav2 de vocês desligado</span></label>
       <div class="detail"><p>O Nav2 do contêiner de vocês é Humble e não conversa com o do Fleet UI. Se ele estiver ligado:</p><div class="cmd"><button type="button">Copiar</button><pre>docker stop ttb4</pre></div></div></li>
     <li><label><span class="box"><input type="checkbox" id="s8"><span class="num"></span></span><span class="what">Relógio do robô igual ao do PC</span></label>
-      <div class="detail"><p>O mesmo comando do guia de troubleshooting de vocês:</p><div class="cmd"><button type="button">Copiar</button><pre>ssh ubuntu@&lt;IP do robô&gt; "sudo date -s '@$(date +%s.%N)'"</pre></div></div></li>
-  </ol>
-</section>
-
-<section class="phase">
-  <div class="phase-head"><span class="when">Antes de mover</span><h2>Checagem pré-voo</h2></div>
-  <ol class="steps" style="--start: 8">
-    <li><label><span class="box"><input type="checkbox" id="s9"><span class="num"></span></span><span class="what">Checagem toda OK</span></label>
-      <div class="detail"><p>Só escuta o robô, não publica nada.</p><div class="cmd"><button type="button">Copiar</button><pre>cd ~/fleet-ui
-make robot-check</pre></div><p class="expect"><b>Esperado:</b> “Tudo certo: pode subir o fleet-ui contra o robô.” Se alguma linha der FALHA:</p>
-      <div class="tablebox"><table>
-        <thead><tr><th>Linha</th><th>O que fazer</th></tr></thead>
-        <tbody>
-          <tr><td>middleware</td><td>O robô precisa estar em CycloneDDS: <code>RMW_IMPLEMENTATION=rmw_cyclonedds_cpp</code> em <code>/etc/turtlebot4/setup.bash</code> e na base Create3, como no guia de vocês. Depois, <code>sudo systemctl restart turtlebot4.service</code> no robô.</td></tr>
-          <tr><td>nós descobertos</td><td>Rede ou domínio. Se o robô não usa o domínio 0: <code>make robot-check ROBOT_DOMAIN=&lt;n&gt;</code> (e o mesmo número no <code>robot-up</code>).</td></tr>
-          <tr><td>relógio</td><td>Repetir o passo 8.</td></tr>
-          <tr><td>TF odom → base_link</td><td>No robô: <code>sudo systemctl restart turtlebot4.service</code> (erro 1 do guia de vocês).</td></tr>
-          <tr><td>taxa /scan ou /odom</td><td>Laser ou base sem publicar: reiniciar o serviço do robô, como acima.</td></tr>
-          <tr><td>Nav2 já rodando (aviso)</td><td>Repetir o passo 7.</td></tr>
-        </tbody>
-      </table></div></div></li>
+      <div class="detail"><p>O mesmo comando do guia de troubleshooting de vocês (pede a senha do robô). O painel do passo 11 também mostra esse comando pronto para copiar.</p><div class="cmd"><button type="button">Copiar</button><pre>ssh ubuntu@192.168.50.11 "sudo date -s '@$(date +%s.%N)'"</pre></div></div></li>
   </ol>
 </section>
 
 <section class="phase">
   <div class="phase-head"><span class="when">Ligar</span><h2>Fleet UI no robô</h2></div>
-  <ol class="steps" style="--start: 9">
+  <ol class="steps" style="--start: 8">
+    <li><label><span class="box"><input type="checkbox" id="s9"><span class="num"></span></span><span class="what">Fleet UI ligado</span></label>
+      <div class="detail"><p>Liga só a tela, ainda sem mexer no robô. Deixem esse terminal aberto. Em cerca de 1 minuto, abram <code>http://localhost:5173</code>.</p><div class="cmd"><button type="button">Copiar</button><pre>cd ~/fleet-ui
+make robot-up ROBOT_IP=192.168.50.11</pre></div><p class="expect"><b>Esperado:</b> à esquerda, o painel <b>Robô real</b>, com o IP já preenchido.</p></div></li>
     <li><label><span class="box"><input type="checkbox" id="s10"><span class="num"></span></span><span class="what">Robô no START</span></label>
       <div class="detail"><p>Coloquem o robô no ponto de partida de sempre, virado para a mesma direção das corridas de vocês.</p></div></li>
-    <li><label><span class="box"><input type="checkbox" id="s11"><span class="num"></span></span><span class="what">Fleet UI ligado no robô</span></label>
-      <div class="detail"><p>Deixem esse terminal aberto. Em cerca de 1 minuto, abram <code>http://localhost:5173</code>.</p><div class="cmd"><button type="button">Copiar</button><pre>make robot-up</pre></div></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s11"><span class="num"></span></span><span class="what">Conectar no painel Robô real</span></label>
+      <div class="detail"><p>Cliquem em <b>▶ Conectar</b>. O painel confere se o IP responde, faz a checagem pré-voo (só escuta o robô, não publica nada) e, se nada der FALHA, liga no PC o mapa, o AMCL e o Nav2.</p><p class="expect"><b>Esperado:</b> em cerca de 30 s, <b>✓ Robô conectado</b> e “Checagem: 14 de 14 OK”.</p><p>Se aparecer <b>✗ Não conectou</b>, a lista mostra a linha com ✗. Depois de resolver, cliquem em <b>↻ Reconectar</b>:</p>
+      <div class="tablebox"><table>
+        <thead><tr><th>Linha</th><th>O que fazer</th></tr></thead>
+        <tbody>
+          <tr><td>rede</td><td>O PC não alcança o IP: confiram se o PC está na TurtleLab (passo 6) e se o IP é o do robô, não o do roteador.</td></tr>
+          <tr><td>middleware</td><td>O robô precisa estar em CycloneDDS: <code>RMW_IMPLEMENTATION=rmw_cyclonedds_cpp</code> em <code>/etc/turtlebot4/setup.bash</code> e na base Create3, como no guia de vocês. Depois, <code>sudo systemctl restart turtlebot4.service</code> no robô.</td></tr>
+          <tr><td>nós descobertos</td><td>A rede passa, mas o ROS não acha o robô: domínio ou middleware. Se o robô não usa o domínio 0, desliguem com Ctrl+C e religuem com <code>make robot-up ROBOT_DOMAIN=&lt;n&gt; ROBOT_IP=192.168.50.11</code>.</td></tr>
+          <tr><td>relógio</td><td>Repetir o passo 8.</td></tr>
+          <tr><td>TF odom → base_link</td><td>No robô: <code>sudo systemctl restart turtlebot4.service</code> (erro 1 do guia de vocês).</td></tr>
+          <tr><td>taxa /scan ou /odom</td><td>Laser ou base sem publicar: reiniciar o serviço do robô, como acima.</td></tr>
+          <tr><td>Nav2 já rodando (aviso)</td><td>Repetir o passo 7.</td></tr>
+        </tbody>
+      </table></div>
+      <p><b>Plano B</b>, se o painel não conectar por outro motivo: Ctrl+C no terminal do passo 9 e o jeito antigo, pelo terminal: <code>make robot-check</code> e, com tudo OK, <code>make robot-up-terminal</code>; depois, na tela, <b>Conectar robô</b> → <b>Custom (simulação local)</b> → <b>Conectar</b>.</p></div></li>
     <li><label><span class="box"><input type="checkbox" id="s12"><span class="num"></span></span><span class="what">Tela confere com o robô</span></label>
-      <div class="detail"><p class="expect"><b>Esperado:</b> no alto da tela, <b>Nav2 ON</b> e posição perto de x = 1,02 e y = 16,62 (o START).</p><p>Se o robô estiver em outro lugar, informem a posição real: na tela, campo <b>Pose inicial</b> (ela é enviada ao AMCL no começo da execução, como o “2D Pose Estimate” do RViz), ou religuem com <code>make robot-up X_POSE=… Y_POSE=… YAW=…</code>.</p><p>A <b>Pose inicial</b> não move o robô: só diz ao AMCL onde ele está. Ela só é certa se o robô estiver de fato naquele ponto, virado na direção informada. O botão <b>⊕ Pose atual</b> copia onde o sistema já acha que o robô está; se essa posição estiver errada, ele copia o erro.</p></div></li>
-    <li><label><span class="box"><input type="checkbox" id="s13"><span class="num"></span></span><span class="what">Conectar a tela</span></label>
-      <div class="detail"><p><b>Conectar robô</b> → <b>Custom (simulação local)</b> → <b>Conectar</b>. O nome diz “simulação”, mas essa opção só confirma que a tela fala com o servidor do próprio PC, que agora está ligado ao robô real.</p></div></li>
+      <div class="detail"><p class="expect"><b>Esperado:</b> no alto da tela, <b>Nav2 ON</b> e posição perto de x = 1,02 e y = 16,62 (o START).</p><p>Se o robô estiver em outro lugar, informem a posição real no campo <b>Pose inicial</b> (ela é enviada ao AMCL no começo da execução, como o “2D Pose Estimate” do RViz).</p><p>A <b>Pose inicial</b> não move o robô: só diz ao AMCL onde ele está. Ela só é certa se o robô estiver de fato naquele ponto, virado na direção informada. O botão <b>⊕ Pose atual</b> copia onde o sistema já acha que o robô está; se essa posição estiver errada, ele copia o erro.</p></div></li>
+    <li><label><span class="box"><input type="checkbox" id="s13"><span class="num"></span></span><span class="what">Executar liberado</span></label>
+      <div class="detail"><p class="expect"><b>Esperado:</b> no topo, <b>● Conectado — robô real 192.168.50.11</b>, e o botão <b>▶ Executar</b> disponível. Não há mais o “Conectar robô → Custom” do topo: o painel já é a conexão.</p></div></li>
   </ol>
 </section>
 
@@ -187,7 +183,7 @@ make robot-check</pre></div><p class="expect"><b>Esperado:</b> “Tudo certo: po
   <div class="phase-head"><span class="when">A corrida</span><h2>Teste BLE</h2></div>
   <ol class="steps" style="--start: 14">
     <li><label><span class="box"><input type="checkbox" id="s15"><span class="num"></span></span><span class="what">Celulares no lugar</span></label>
-      <div class="detail"><p>Um fixo no START, o outro em cima do robô, conectados, como nas corridas de vocês. O Fleet UI não mexe no Bluetooth: a conexão entre os celulares e a leitura do sinal continuam do jeito de sempre, fora dele. O botão <b>Conectar robô</b> da tela não tem relação com Bluetooth.</p></div></li>
+      <div class="detail"><p>Um fixo no START, o outro em cima do robô, conectados, como nas corridas de vocês. O Fleet UI não mexe no Bluetooth: a conexão entre os celulares e a leitura do sinal continuam do jeito de sempre, fora dele. O painel <b>Robô real</b> da tela não tem relação com Bluetooth.</p></div></li>
     <li><label><span class="box"><input type="checkbox" id="s16"><span class="num"></span></span><span class="what">Leitura BLE começando no PC Windows</span></label>
       <div class="detail"><p>Antes, confiram que o relógio do PC Windows está no horário automático e no fuso de Recife: a análise casa o sinal com a posição pelo horário.</p><div class="cmd"><button type="button">Copiar</button><pre>.\script_celular.ps1</pre></div></div></li>
     <li><label><span class="box"><input type="checkbox" id="s17"><span class="num"></span></span><span class="what">Executar o percurso</span></label>
@@ -206,7 +202,7 @@ make robot-check</pre></div><p class="expect"><b>Esperado:</b> “Tudo certo: po
       <div class="detail"><div class="cmd"><button type="button">Copiar</button><pre>make cbsoft-csv
 make cbsoft-analise NAV=collections/cbsoft/&lt;navegacao&gt;.csv NRF="collections/cbsoft/nrf/&lt;log&gt;.txt"</pre></div><p class="expect"><b>Esperado:</b> um PNG ao lado do CSV, com o RSSI ao longo da posição.</p></div></li>
     <li><label><span class="box"><input type="checkbox" id="s21"><span class="num"></span></span><span class="what">Robô de volta ao START para a próxima</span></label>
-      <div class="detail"><p>Esperem o campo Nav voltar para <b>idle</b>, com o robô parado. Levem o robô ao START com as mãos, virado na mesma direção de sempre; uma marca de fita no chão ajuda a repetir o lugar. Deixem a <b>Pose inicial</b> no START (passo 17) e voltem ao passo 15, sem religar nada.</p><p><b>Plano B</b>, se a verificação do passo 14 falhou ou a posição não for para o START: parem o terminal do passo 11 com Ctrl+C e rodem <code>make robot-up</code> de novo, com o robô já no START.</p><p>Anotem a cada corrida como o robô foi posto no START (marca no chão, direção). Colocar o robô à mão muda um pouco o ponto de partida de uma corrida para outra, e isso precisa constar nos resultados.</p></div></li>
+      <div class="detail"><p>Esperem o campo Nav voltar para <b>idle</b>, com o robô parado. Levem o robô ao START com as mãos, virado na mesma direção de sempre; uma marca de fita no chão ajuda a repetir o lugar. Deixem a <b>Pose inicial</b> no START (passo 17) e voltem ao passo 15, sem religar nada.</p><p><b>Plano B</b>, se a verificação do passo 14 falhou ou a posição não for para o START: com o robô já no START, cliquem em <b>↻ Reconectar</b> no painel Robô real (cerca de 30 s): o AMCL recomeça no START.</p><p>Anotem a cada corrida como o robô foi posto no START (marca no chão, direção). Colocar o robô à mão muda um pouco o ponto de partida de uma corrida para outra, e isso precisa constar nos resultados.</p></div></li>
   </ol>
 </section>
 
@@ -221,7 +217,7 @@ make cbsoft-analise NAV=collections/cbsoft/&lt;navegacao&gt;.csv NRF="collection
 </section>
 
 <footer>
-  <p>Até agora, a ligação com o robô foi testada com um robô falso, que publica laser, odometria e TF como o TurtleBot4: checagem OK, Nav2 ativo, deslocamento de 1 m concluído e parada no meio do percurso funcionando. Esta é a primeira vez com o robô de verdade.</p>
+  <p>Até agora, a ligação com o robô foi testada com um robô falso, que publica laser, odometria e TF como o TurtleBot4: pelo painel Robô real, IP errado recusado, checagem OK, Nav2 ativo em cerca de 25 s, deslocamento de 1 m concluído, Reconectar sem deixar processos para trás, percurso com gravação de <code>/amcl_pose</code> e parada no meio funcionando. Esta é a primeira vez com o robô de verdade.</p>
   <p>Fleet UI, repositório <code>fleet-ui-ufpe</code>. Dúvidas: falem com o Eduardo.</p>
   <button type="button" class="reset" id="reset">Desmarcar tudo</button>
 </footer>

@@ -305,16 +305,13 @@ self.create_subscription(PoseWithCovarianceStamped, "/amcl_pose",
       <div class="card"><span class="pill open">a testar no robô</span><h3>Jazzy conversando com Humble</h3><p>As actions do Nav2 mudaram entre as versões, então o Nav2 roda no PC, do lado do Fleet UI, como no setup de vocês. O robô só manda laser, odometria e TF e recebe velocidade; essas mensagens são idênticas no Humble e no Jazzy.</p></div>
       <div class="card"><span class="pill open">a fazer</span><h3>Leitura BLE no robô</h3><p>A leitura do Bluetooth a bordo do robô real ainda não está integrada ao Fleet UI.</p></div>
     </div>
-    <h3>Primeiro passo no dia: a checagem pré-voo</h3>
-    <p>Com o robô ligado e na mesma rede, antes de mover qualquer coisa:</p>
+    <h3>No dia: ligar e conectar pela tela</h3>
+    <p>Com o PC na rede do robô (a <b>TurtleLab</b>, sem internet) e o Nav2 de vocês desligado (ele é Humble e não conversa com o do Fleet UI):</p>
     <div class="cmd"><button type="button">Copiar</button><pre>cd ~/fleet-ui
-make robot-check   <span class="c"># domínio 0 e CycloneDDS, como o robô de vocês</span></pre></div>
-    <p>Ela só escuta, não publica nada. Confere os nós do robô, os tópicos <code>/scan</code>, <code>/odom</code>, <code>/tf</code> e <code>/tf_static</code>, as taxas, o TF <code>odom → base_link</code> e a defasagem de relógio entre robô e PC, os mesmos problemas do guia de troubleshooting de vocês. Também avisa se já há um Nav2 rodando, que precisa ser desligado antes do Nav2 do Fleet UI subir.</p>
-    <h3>Depois: ligar o Fleet UI no robô</h3>
-    <p>Com a checagem toda OK, desliguem o Nav2 que vocês costumam subir no Docker de vocês (ele é Humble e não conversa com o do Fleet UI) e rodem:</p>
-    <div class="cmd"><button type="button">Copiar</button><pre>make robot-up</pre></div>
-    <p>Sobe no PC o mapa <code>hall_cin_v4</code>, o AMCL com o robô no START e o Nav2, sem simulação, no domínio e middleware do robô. A tela abre no mesmo endereço, <code>http://localhost:5173</code>. Se o robô não estiver exatamente no START, ajustem a pose inicial: <code>make robot-up X_POSE=… Y_POSE=… YAW=…</code>.</p>
-    <p>Testamos tudo isso com um robô falso, que publica laser, odometria e TF como o TurtleBot4: a checagem passou, o Nav2 subiu e um deslocamento de 1 m terminou com sucesso. O teste com o robô de verdade é o que falta.</p>
+make robot-up ROBOT_IP=192.168.50.11   <span class="c"># o IP do robô, não o do roteador</span></pre></div>
+    <p>Isso liga só a tela, em <code>http://localhost:5173</code>, já no domínio e middleware do robô (0 e CycloneDDS). No painel <b>Robô real</b>, à esquerda, <b>▶ Conectar</b> faz em sequência o que antes era do terminal: confere se o IP responde, roda a checagem pré-voo e, sem nenhuma FALHA, sobe no PC o mapa <code>hall_cin_v4</code>, o AMCL com o robô no START e o Nav2.</p>
+    <p>A checagem só escuta, não publica nada. Confere os nós do robô, os tópicos <code>/scan</code>, <code>/odom</code>, <code>/tf</code> e <code>/tf_static</code>, as taxas, o TF <code>odom → base_link</code> e a defasagem de relógio entre robô e PC, os mesmos problemas do guia de troubleshooting de vocês, e avisa se já há um Nav2 rodando. Cada linha aparece na tela com ✓ ou ✗. <b>↻ Reconectar</b> desliga tudo e refaz, por exemplo depois de acertar o relógio ou trocar o IP.</p>
+    <p>Testamos tudo isso com um robô falso, que publica laser, odometria e TF como o TurtleBot4: IP errado recusado, checagem OK, Nav2 ativo em cerca de 25 s, deslocamento de 1 m concluído e percurso gravando a posição. O teste com o robô de verdade é o que falta. Se o painel não conectar, o jeito antigo continua: <code>make robot-check</code> e <code>make robot-up-terminal</code>.</p>
     <div class="note warn"><b>Segurança.</b> Na primeira vez, deixem o robô com espaço livre em volta e alguém perto dele. O botão <b>■ Parar</b> da tela cancela a navegação, mas leva cerca de 3 s para o robô parar (ele anda ainda uns 80 cm): numa emergência, a parada é física. Comecem com um deslocamento curto antes do percurso de 96 m. O roteiro do dia tem o passo a passo completo.</div>
   </div>
 </section>
