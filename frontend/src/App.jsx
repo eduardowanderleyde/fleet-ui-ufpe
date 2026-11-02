@@ -248,6 +248,13 @@ export default function App() {
   const nav2Ok = status.nav2_ready === true
   // Modo robô real: o painel "Robô real" é a conexão (rede + pré-voo + Nav2).
   const robotMode = robotLink.status.robot_mode
+  // Pose inicial vazia (0,0,0) no modo robô: começa no START do make robot-up,
+  // onde o robô é posto a cada corrida. Se alguém mudar o campo, fica o que mudou.
+  const startPose = robotLink.status.start_pose
+  useEffect(() => {
+    if (!robotMode || !Array.isArray(startPose)) return
+    setCfg(c => c.initial_pose?.some(v => v !== 0) ? c : { ...c, initial_pose: startPose })
+  }, [robotMode, startPose?.join(',')])  // eslint-disable-line react-hooks/exhaustive-deps
   const isConnected = robotMode ? robotLink.status.phase === 'ready' : connStatus === 'connected'
 
   const lineColor = line => {
@@ -419,6 +426,7 @@ export default function App() {
             waypoints={cfg.command === 'record' ? cfg.points : replayPoses}
             onAddWaypoint={cfg.command === 'record' ? addWaypoint : undefined}
             onRouteOutsideChange={setRouteOutside}
+            defaultMapName={robotMode ? robotLink.status.robot_map : undefined}
           />
         </div>
 

@@ -1117,9 +1117,20 @@ def _robot_nav_ready(started_at: float) -> bool:
 _robot_link = RobotLink(ROS_WS, _bridge.ros_env, _bridge.ros_setup_prefix, _robot_nav_ready)
 
 
+def _robot_start_pose() -> list[float]:
+    """START do make robot-up (X_POSE/Y_POSE/YAW): a tela usa como Pose inicial padrão."""
+    defaults = ("1.0216323137283325", "16.61626625061035", "0.0")
+    try:
+        return [round(float(os.environ.get(k) or d), 3) for k, d in zip(("X_POSE", "Y_POSE", "YAW"), defaults)]
+    except ValueError:
+        return [round(float(d), 3) for d in defaults]
+
+
 @app.get("/api/robot/status")
 async def robot_status():
-    return {"robot_mode": ROBOT_MODE, "default_ip": os.environ.get("ROBOT_IP", ""), **_robot_link.status()}
+    return {"robot_mode": ROBOT_MODE, "default_ip": os.environ.get("ROBOT_IP", ""),
+            "start_pose": _robot_start_pose(), "robot_map": os.environ.get("ROBOT_MAP") or "hall_cin_v4",
+            **_robot_link.status()}
 
 
 @app.post("/api/robot/connect")

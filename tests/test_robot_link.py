@@ -210,6 +210,13 @@ class RobotEndpointTests(unittest.IsolatedAsyncioTestCase):
             r = await self.client.post("/api/simulation/start", json={"mode": "single"})
         self.assertEqual(r.status_code, 409)
 
+    async def test_status_gives_the_robot_up_start_as_default_pose(self):
+        with patch.dict("os.environ", {"X_POSE": "1.0216323137283325", "Y_POSE": "16.61626625061035", "YAW": "0.0", "ROBOT_MAP": ""}):
+            s = (await self.client.get("/api/robot/status")).json()
+        self.assertEqual(s["start_pose"], [1.022, 16.616, 0.0])
+        self.assertEqual(s["robot_map"], "hall_cin_v4")
+        self.assertTrue((ROOT / "frontend" / "public" / "hall_cin_v4_map.json").exists())
+
     async def test_invalid_ip_is_a_400(self):
         with patch.object(backend_main, "ROBOT_MODE", True):
             r = await self.client.post("/api/robot/connect", json={"ip": "robo"})

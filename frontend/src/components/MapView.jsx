@@ -2,11 +2,11 @@ import { useMapCanvas } from '../hooks/useMapCanvas'
 import MapToolbar from './MapToolbar'
 import { color } from '../styles/tokens'
 
-export default function MapView({ robotId, poses, waypoints, onAddWaypoint, onRouteOutsideChange }) {
-  const map = useMapCanvas({ robotId, poses, waypoints, onRouteOutsideChange })
+export default function MapView({ robotId, poses, waypoints, onAddWaypoint, onRouteOutsideChange, defaultMapName }) {
+  const map = useMapCanvas({ robotId, poses, waypoints, onRouteOutsideChange, defaultMapName })
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '0.5rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, gap: '0.5rem' }}>
       <MapToolbar
         showFloor={map.showFloor}
         floorMismatch={map.floorMismatch}
@@ -47,7 +47,11 @@ export default function MapView({ robotId, poses, waypoints, onAddWaypoint, onRo
         onMouseLeave={map.onMouseLeave}
         onContextMenu={e => e.preventDefault()}
         style={{
+          // minHeight 0: sem isso o canvas não encolhe abaixo da altura que
+          // ele mesmo desenhou (~500 px) e, em tela baixa, o pé do mapa (os
+          // últimos waypoints do percurso) fica fora da vista.
           flex: 1,
+          minHeight: 0,
           width: '100%',
           borderRadius: '10px',
           border: `1px solid ${color.borderDark}`,

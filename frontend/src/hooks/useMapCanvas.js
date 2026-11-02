@@ -54,12 +54,13 @@ function countOutside(points, live, plan) {
 // Toda a lógica imperativa do mapa (desenho em canvas, carga de imagens,
 // zoom/pan, conversão de coordenadas) — separada de MapView pra deixar o
 // componente só com composição/JSX. Devolve refs + estado + handlers.
-export function useMapCanvas({ robotId, poses, waypoints, onRouteOutsideChange }) {
+export function useMapCanvas({ robotId, poses, waypoints, onRouteOutsideChange, defaultMapName }) {
   const canvasRef    = useRef(null)
   const imgRef       = useRef(null)   // SLAM PNG
   const floorImgRef  = useRef(null)   // Planta estática
   const mapMeta      = useRef(null)
   const scaleRef     = useRef(1)
+  const floorMetaRef = useRef(null)   // metadados da planta de fundo carregada
   const panRef       = useRef({ x: 0, y: 0 })
   const dragRef      = useRef(null)
 
@@ -75,6 +76,11 @@ export function useMapCanvas({ robotId, poses, waypoints, onRouteOutsideChange }
   const [savingMap, setSavingMap]       = useState(false)
   const [saveMsg, setSaveMsg]           = useState(null)
   const [mapName, setMapName]           = useState('slam')   // 'slam' | 'warehouse' | nome importado
+  // Modo robô real: a planta do lugar (ex.: hall_cin_v4) desde o início, antes
+  // de o map_server mandar o mapa ao vivo; sem isso a tela abre no warehouse.
+  useEffect(() => {
+    if (defaultMapName) setMapName(defaultMapName)
+  }, [defaultMapName])
   const [mapOptions, setMapOptions]     = useState(['warehouse'])
   const [importingMap, setImportingMap] = useState(false)
   const [importMsg, setImportMsg]       = useState(null)
@@ -83,7 +89,9 @@ export function useMapCanvas({ robotId, poses, waypoints, onRouteOutsideChange }
   const [floorScale]  = useState(HOUSE_WORLD.x1 - HOUSE_WORLD.x0)
 
   // Usa SLAM se disponível, senão usa o mapa estático do warehouse
-  const activeMap = useCallback(() => mapMeta.current || WAREHOUSE_MAP, [])
+  // Sem mapa ao vivo, enquadra pela planta carregada (ex.: hall_cin_v4 no
+  // modo robô, antes de conectar), não sempre pelo warehouse.
+  const activeMap = useCallback(() => mapMeta.current || floorMetaRef.current || WAREHOUSE_MAP, [])
 
   // Converte coords mundo → canvas
   const worldToCanvas = useCallback((wx, wy) => {
@@ -320,6 +328,7 @@ export function useMapCanvas({ robotId, poses, waypoints, onRouteOutsideChange }
       img.src = WAREHOUSE_MAP.src + '?t=' + Date.now()
       img.onload = () => {
         floorImgRef.current = img
+        floorMetaRef.current = WAREHOUSE_MAP
         setSavedMapMeta(WAREHOUSE_MAP)
         fitMap()
         draw()
@@ -335,6 +344,7 @@ export function useMapCanvas({ robotId, poses, waypoints, onRouteOutsideChange }
         img.src = `/${prefix}.png?t=` + Date.now()
         img.onload = () => {
           floorImgRef.current = img
+          floorMetaRef.current = d
           setSavedMapMeta(d)
           fitMap()
           draw()
