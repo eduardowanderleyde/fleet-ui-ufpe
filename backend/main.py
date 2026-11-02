@@ -30,6 +30,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from ros_bridge import RosBridge
+from robot_link import RobotLink
 from agents import Analyst, Executor, Planner, MissionRouter, RobotCandidate, decompose_and_route
 
 # Robôs simulados (mesma variável usada pelos launch files ROS 2 — precisa
@@ -250,6 +251,10 @@ class RunCampaignRequest(BaseModel):
     topics: list[str] = Field(default_factory=lambda: ["scan", "odom", "imu", "pose"])
     return_to_start: list[float] | None = None
     run_id: str | None = None  # gerado automaticamente se omitido
+
+
+class RobotConnectRequest(BaseModel):
+    ip: str
 
 
 class StartSimulationRequest(BaseModel):
@@ -1073,6 +1078,11 @@ async def simulation_status():
 
 @app.post("/api/simulation/start")
 async def simulation_start(cfg: StartSimulationRequest):
+    if ROBOT_MODE:
+        return JSONResponse(
+            {"success": False, "message": "Modo robô real: a simulação usaria o mesmo domínio do robô."},
+            status_code=409,
+        )
     with _sim_lock:
         if _sim_state["running"]:
             return JSONResponse(
@@ -1091,6 +1101,43 @@ async def simulation_start(cfg: StartSimulationRequest):
 @app.post("/api/simulation/stop")
 def simulation_stop():  # def, não async: _stop_simulation dorme vários segundos
     _stop_simulation()
+    return {"success": True}
+
+
+# ── Robô real pela tela (make robot-up) ─────────────────────────────────────
+# Sem FLEET_ROBOT_MODE, nada disto aparece: a tela segue no modo simulação.
+ROBOT_MODE = os.environ.get("FLEET_ROBOT_MODE", "").strip().lower() in ("true", "1", "yes")
+
+
+def _robot_nav_ready(started_at: float) -> bool:
+    with _status_lock:
+        return bool(_fleet_status.get("nav2_ready")) and _fleet_status.get("nav2_ready_robots_at", 0) > started_at
+
+
+_robot_link = RobotLink(ROS_WS, _bridge.ros_env, _bridge.ros_setup_prefix, _robot_nav_ready)
+
+
+@app.get("/api/robot/status")
+async def robot_status():
+    return {"robot_mode": ROBOT_MODE, "default_ip": os.environ.get("ROBOT_IP", ""), **_robot_link.status()}
+
+
+@app.post("/api/robot/connect")
+async def robot_connect(body: RobotConnectRequest):
+    if not ROBOT_MODE:
+        return JSONResponse({"success": False, "message": "Só no modo robô real (make robot-up)."}, status_code=409)
+    try:
+        state = _robot_link.connect(body.ip)
+    except ValueError as exc:
+        return JSONResponse({"success": False, "message": str(exc)}, status_code=400)
+    except RuntimeError as exc:
+        return JSONResponse({"success": False, "message": str(exc)}, status_code=409)
+    return {"success": True, **state}
+
+
+@app.post("/api/robot/disconnect")
+def robot_disconnect():  # def, não async: espera os processos encerrarem
+    _robot_link.disconnect()
     return {"success": True}
 
 

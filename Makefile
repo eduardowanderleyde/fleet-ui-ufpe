@@ -5,15 +5,19 @@ COMPOSE ?= docker compose
 # satura e o Nav2 aborta trajetos longos.
 # NAV2_*: rota de ~95 m precisa de mais folga no BT e de A* no planner
 # (ver _make_nav2_params em turtlebot4_sim.launch.py).
+# NAV2_CONTROLLER=dwb troca o MPPI do Jazzy pelo DWB do TurtleBot4 no Humble, o
+# do artigo. Ainda não testado: o padrão continua MPPI
+# (`make cbsoft-up NAV2_CONTROLLER=dwb` ou `make robot-up NAV2_CONTROLLER=dwb`).
+NAV2_CONTROLLER ?=
 # Domínio ROS próprio: com o padrão (0) a simulação se mistura, na mesma rede,
 # com TurtleBot4 reais (que também usam 0) — o Nav2 simulado poderia comandar
 # um robô de verdade. Troque com `make cbsoft-up CBSOFT_DOMAIN=<n>`.
 CBSOFT_DOMAIN ?= 42
 CBSOFT_ENV = ROS_DOMAIN_ID=$(CBSOFT_DOMAIN) WORLD=cbsoft_open LOCALIZATION=amcl HEADLESS=True \
-	NAV2_DEFAULT_SERVER_TIMEOUT_MS=1000 NAV2_NAVFN_USE_ASTAR=true \
+	NAV2_DEFAULT_SERVER_TIMEOUT_MS=1000 NAV2_NAVFN_USE_ASTAR=true NAV2_CONTROLLER=$(NAV2_CONTROLLER) \
 	X_POSE=1.0216323137283325 Y_POSE=16.61626625061035 YAW=0.0
 
-.PHONY: docker-build docker-up docker-down docker-logs docker-shell docker-check cbsoft-up cbsoft-run cbsoft-csv cbsoft-analise robot-check robot-up
+.PHONY: docker-build docker-up docker-down docker-logs docker-shell docker-check cbsoft-up cbsoft-run cbsoft-csv cbsoft-analise robot-check robot-up robot-up-terminal
 
 # Fuso local no container: o Timestamp_Legivel do CSV precisa casar com o
 # horário do celular (log do nRF Connect), que é local.
@@ -81,11 +85,24 @@ robot-check:
 		-e TZ=$(TZ_LOCAL) -v $(CURDIR)/fleet_ws/scripts:/workspace/fleet_ws/scripts:ro -w /workspace/fleet_ws backend \
 		bash -c "source /opt/ros/jazzy/setup.bash && python3 scripts/robot_preflight.py"
 
-# Fleet UI contra o TurtleBot4 real: mapa hall_cin_v4 + AMCL + Nav2 no PC, sem
-# Gazebo, relógio do sistema, mesmo domínio e middleware do robô. Rode
-# `make robot-check` antes e desligue qualquer Nav2 que já esteja no domínio.
+# Fleet UI contra o TurtleBot4 real. `make robot-up` sobe só o backend e a tela,
+# no domínio e middleware do robô; na tela, o painel "Robô real" recebe o IP,
+# confere a rede, roda a checagem pré-voo e liga mapa hall_cin_v4 + AMCL + Nav2
+# no PC (Reconectar refaz tudo). ROBOT_IP só preenche o campo:
+#   make robot-up ROBOT_IP=192.168.50.11
+# Plano B, o jeito antigo (tudo sobe já no terminal, sem o painel):
+#   make robot-check && make robot-up-terminal
+ROBOT_IP ?=
+ROBOT_ENV = ROS_DOMAIN_ID=$(ROBOT_DOMAIN) RMW_IMPLEMENTATION=$(ROBOT_RMW) TZ=$(TZ_LOCAL) \
+	NAV2_CONTROLLER=$(NAV2_CONTROLLER) ROBOT_IP=$(ROBOT_IP)
+ROBOT_COMPOSE = $(COMPOSE) -f docker-compose.yml -f docker-compose.robot.yml
+
 robot-up:
 	mkdir -p fleet_ws/routes/default
 	cp fleet_ws/scripts/cbsoft/percurso_cbsoft.yaml fleet_ws/routes/default/
-	ROS_DOMAIN_ID=$(ROBOT_DOMAIN) RMW_IMPLEMENTATION=$(ROBOT_RMW) TZ=$(TZ_LOCAL) \
-		$(COMPOSE) -f docker-compose.yml -f docker-compose.robot.yml up
+	$(ROBOT_ENV) FLEET_ROBOT_MODE=true BACKEND_START_DELAY=2 $(ROBOT_COMPOSE) up --no-deps backend frontend
+
+robot-up-terminal:
+	mkdir -p fleet_ws/routes/default
+	cp fleet_ws/scripts/cbsoft/percurso_cbsoft.yaml fleet_ws/routes/default/
+	$(ROBOT_ENV) FLEET_ROBOT_MODE=false $(ROBOT_COMPOSE) up

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import ConfigForm from './components/ConfigForm'
 import AgentFleetPanel from './components/AgentFleetPanel'
 import SimulationPanel from './components/SimulationPanel'
+import RobotPanel from './components/RobotPanel'
 import MapView from './components/MapView'
 import ConnectionPanel, { ROBOT_PROFILES } from './components/ConnectionPanel'
 import DiscoveryPanel from './components/DiscoveryPanel'
@@ -20,6 +21,7 @@ import { useJobPolling } from './hooks/useJobPolling'
 import { useRoutePoses, useRoutes } from './hooks/useRoutes'
 import { useRunHistory } from './hooks/useRunHistory'
 import { useSimulation } from './hooks/useSimulation'
+import { useRobotLink } from './hooks/useRobotLink'
 
 // Agentes de IA fora do escopo atual (saíram da dissertação): escondidos da
 // tela, código mantido. Religar com VITE_SHOW_AGENTS=true no build.
@@ -60,6 +62,7 @@ export default function App() {
   const [resetMsg, setResetMsg]     = useState(null)
   const [resetting, setResetting]   = useState(false)
   const sim                         = useSimulation()
+  const robotLink                   = useRobotLink()
 
   const [connPanel, setConnPanel]             = useState(false)
   const [selectedProfile, setSelectedProfile] = useState('custom')
@@ -243,7 +246,9 @@ export default function App() {
   }, [status.poses, status.pose, effectiveRobotId])
   const robot  = status.robots?.find(r => r.robot_id === effectiveRobotId) || status.robots?.[0] || {}
   const nav2Ok = status.nav2_ready === true
-  const isConnected = connStatus === 'connected'
+  // Modo robô real: o painel "Robô real" é a conexão (rede + pré-voo + Nav2).
+  const robotMode = robotLink.status.robot_mode
+  const isConnected = robotMode ? robotLink.status.phase === 'ready' : connStatus === 'connected'
 
   const lineColor = line => {
     if (line.includes('[OK]'))     return color.success
@@ -291,7 +296,7 @@ export default function App() {
       {/* ── Barra de conexão ─────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem 0.75rem', alignItems: 'center', padding: '0.3rem 1rem', borderBottom: `1px solid ${color.border}`, flexShrink: 0, position: 'relative' }}>
 
-        <ConnectionPanel
+        {!robotMode && <ConnectionPanel
           containerRef={panelRef}
           isOpen={connPanel}
           onToggle={openConnPanel}
@@ -303,9 +308,9 @@ export default function App() {
           connMsg={connMsg}
           onConnect={connectRobot}
           onDisconnect={() => { setConnStatus('idle'); setConnMsg(''); setConnPanel(false) }}
-        />
+        />}
 
-        <DiscoveryPanel
+        {!robotMode && <DiscoveryPanel
           containerRef={discoverRef}
           isOpen={discoverPanel}
           onToggle={openDiscoverPanel}
@@ -319,7 +324,7 @@ export default function App() {
           onDiscover={discoverRobots}
           testingSSH={testingSSH}
           onTestSSH={testSSH}
-        />
+        />}
 
         {SHOW_AGENTS && (
           <div ref={agentRef} style={{ position: 'relative' }}>
@@ -338,7 +343,7 @@ export default function App() {
           history={runHistory}
         />
 
-        {isConnected && <span style={{ fontSize: '0.8rem', color: color.success, fontFamily: 'monospace' }}>● Conectado — {[...ROBOT_PROFILES, ...extraProfiles].find(p => p.id === selectedProfile)?.label}</span>}
+        {isConnected && <span style={{ fontSize: '0.8rem', color: color.success, fontFamily: 'monospace' }}>● Conectado — {robotMode ? `robô real ${robotLink.status.ip}` : [...ROBOT_PROFILES, ...extraProfiles].find(p => p.id === selectedProfile)?.label}</span>}
         {connStatus === 'error' && <span style={{ fontSize: '0.8rem', color: color.danger, fontFamily: 'monospace' }}>✗ {connMsg}</span>}
       </div>
 
@@ -347,7 +352,9 @@ export default function App() {
 
         {/* Coluna esquerda: formulário */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', overflowY: 'auto', paddingRight: '0.2rem', minHeight: 0 }}>
-          <SimulationPanel sim={sim} externalSim={nav2Ok && !sim.status.running} />
+          {robotLink.status.robot_mode
+            ? <RobotPanel link={robotLink} />
+            : <SimulationPanel sim={sim} externalSim={nav2Ok && !sim.status.running} />}
 
           <span style={{ fontSize: '0.8rem', fontWeight: 600, color: color.textMuted, flexShrink: 0 }}>Configuração</span>
           <ConfigForm
@@ -362,7 +369,7 @@ export default function App() {
 
           {!isConnected && (
             <div role="status" style={{ color: color.warning, fontSize: '0.82rem', padding: '0.5rem 0.75rem', background: 'rgba(251,191,36,0.08)', borderRadius: '6px', border: '1px solid rgba(251,191,36,0.2)' }}>
-              ⚠ Conecte um robô antes de executar.
+              ⚠ {robotMode ? 'Conecte o robô no painel “Robô real” antes de executar.' : 'Conecte um robô antes de executar.'}
             </div>
           )}
           {isConnected && !nav2Ok && (

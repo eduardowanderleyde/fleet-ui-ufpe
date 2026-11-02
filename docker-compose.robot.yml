@@ -1,4 +1,5 @@
-# Modo robô real: `make robot-up` (docker compose -f docker-compose.yml -f docker-compose.robot.yml up).
+# Modo robô real: `make robot-up` (só backend + tela; o painel "Robô real" liga o resto)
+# ou `make robot-up-terminal` (docker compose -f docker-compose.yml -f docker-compose.robot.yml up).
 # O serviço "sim" deixa de subir o Gazebo e sobe só mapa + AMCL + Nav2 contra o
 # TurtleBot4 de verdade; fleet/backend usam o relógio do sistema e o mesmo
 # middleware do robô (CycloneDDS no CIn).
@@ -18,6 +19,7 @@ services:
       YAW: ${YAW:-0.0}
       NAV2_DEFAULT_SERVER_TIMEOUT_MS: ${NAV2_DEFAULT_SERVER_TIMEOUT_MS:-1000}
       NAV2_NAVFN_USE_ASTAR: ${NAV2_NAVFN_USE_ASTAR:-true}
+      NAV2_CONTROLLER: ${NAV2_CONTROLLER:-}  # dwb = o controlador do artigo (Humble); vazio = MPPI
   fleet:
     environment:
       <<: *robot-env
@@ -26,6 +28,18 @@ services:
     environment:
       <<: *robot-env
       BACKEND_START_DELAY: ${BACKEND_START_DELAY:-14}
+      # make robot-up: o painel "Robô real" da tela liga mapa + AMCL + Nav2 e o
+      # orquestrador como processos do backend (backend/robot_link.py), com os
+      # mesmos parâmetros do serviço sim acima.
+      FLEET_ROBOT_MODE: ${FLEET_ROBOT_MODE:-false}
+      ROBOT_IP: ${ROBOT_IP:-}
+      ROBOT_MAP: ${ROBOT_MAP:-hall_cin_v4}
+      X_POSE: ${X_POSE:-1.0216323137283325}
+      Y_POSE: ${Y_POSE:-16.61626625061035}
+      YAW: ${YAW:-0.0}
+      NAV2_DEFAULT_SERVER_TIMEOUT_MS: ${NAV2_DEFAULT_SERVER_TIMEOUT_MS:-1000}
+      NAV2_NAVFN_USE_ASTAR: ${NAV2_NAVFN_USE_ASTAR:-true}
+      NAV2_CONTROLLER: ${NAV2_CONTROLLER:-}
   frontend:
     environment:
       <<: *robot-env

@@ -144,3 +144,20 @@ export async function deactivateRobot(robotId) {
   const params = new URLSearchParams({ robot_id: robotId })
   return readJson(await fetch(apiPath(`/simulation/deactivate_robot?${params.toString()}`), { method: 'POST' }))
 }
+
+// Robô real pela tela (make robot-up): IP → rede → pré-voo → Nav2 no PC.
+export async function getRobotStatus() {
+  return readJson(await fetch(apiPath('/robot/status')))
+}
+
+export async function connectRobot(ip) {
+  return readJson(await fetch(apiPath('/robot/connect'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ip }),
+  }))
+}
+
+export async function disconnectRobot() {
+  return readJson(await fetch(apiPath('/robot/disconnect'), { method: 'POST' }))
+}

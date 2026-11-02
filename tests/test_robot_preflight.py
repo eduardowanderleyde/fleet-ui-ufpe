@@ -48,6 +48,11 @@ class RobotPreflightRulesTests(unittest.TestCase):
         self.assertAlmostEqual(stats.median_skew(), 0.2)
         self.assertIsNone(rp.TopicStats().rate_hz())
 
+    def test_local_helper_nodes_do_not_count_as_robot(self):
+        names = ["fleet_ui_bridge", "_ros2cli_daemon_0_abc", "_ros2cli_requester_x", "turtlebot4_node"]
+        self.assertEqual(rp.robot_nodes(names, ("fleet_ui_bridge",)), ["turtlebot4_node"])
+        self.assertEqual(rp.robot_nodes(["_ros2cli_daemon_0_abc"]), [])
+
     def test_report_exit_code_ignores_warnings(self):
         ok = [rp.Check("a", True, ""), rp.Check("b", False, "", warn_only=True)]
         self.assertEqual(rp.report(ok), 0)

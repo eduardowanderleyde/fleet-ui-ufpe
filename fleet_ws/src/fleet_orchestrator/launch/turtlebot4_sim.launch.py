@@ -73,10 +73,38 @@ def _make_nav2_params(_ctx):
     if os.environ.get('NAV2_NAVFN_USE_ASTAR', '').strip().lower() in ('true', '1', 'yes'):
         cfg['planner_server']['ros__parameters']['GridBased']['use_astar'] = True
 
+    # O experimento BLE do CIn foi feito no Humble, cujo TurtleBot4 navega com o
+    # DWB; o Jazzy troca para o MPPI (aleatório, pode dar ré). Com
+    # NAV2_CONTROLLER=dwb usamos o mesmo controlador e parâmetros do artigo.
+    if os.environ.get('NAV2_CONTROLLER', '').strip().lower() == 'dwb':
+        cfg['controller_server']['ros__parameters']['FollowPath'] = dict(HUMBLE_TB4_DWB)
+
     tmp = tempfile.NamedTemporaryFile(mode='w', suffix='_nav2.yaml', delete=False)
     yaml.safe_dump(cfg, tmp)
     tmp.close()
     return tmp.name
+
+
+# Bloco FollowPath do nav2.yaml do TurtleBot4 no Humble, copiado sem mudanças:
+# https://github.com/turtlebot/turtlebot4/blob/humble/turtlebot4_navigation/config/nav2.yaml
+HUMBLE_TB4_DWB = {
+    'plugin': 'dwb_core::DWBLocalPlanner',
+    'debug_trajectory_details': True,
+    'min_vel_x': 0.0, 'min_vel_y': 0.0, 'max_vel_x': 0.26, 'max_vel_y': 0.0, 'max_vel_theta': 1.0,
+    'min_speed_xy': 0.0, 'max_speed_xy': 0.26, 'min_speed_theta': 0.0,
+    'acc_lim_x': 2.5, 'acc_lim_y': 0.0, 'acc_lim_theta': 3.2,
+    'decel_lim_x': -2.5, 'decel_lim_y': 0.0, 'decel_lim_theta': -3.2,
+    'vx_samples': 20, 'vy_samples': 5, 'vtheta_samples': 20,
+    'sim_time': 1.7, 'linear_granularity': 0.05, 'angular_granularity': 0.025,
+    'transform_tolerance': 0.2, 'xy_goal_tolerance': 0.25, 'trans_stopped_velocity': 0.25,
+    'short_circuit_trajectory_evaluation': True, 'stateful': True,
+    'critics': ['RotateToGoal', 'Oscillation', 'BaseObstacle', 'GoalAlign', 'PathAlign', 'PathDist', 'GoalDist'],
+    'BaseObstacle.scale': 0.02,
+    'PathAlign.scale': 32.0, 'PathAlign.forward_point_distance': 0.1,
+    'GoalAlign.scale': 24.0, 'GoalAlign.forward_point_distance': 0.1,
+    'PathDist.scale': 32.0, 'GoalDist.scale': 24.0,
+    'RotateToGoal.scale': 32.0, 'RotateToGoal.slowing_factor': 5.0, 'RotateToGoal.lookahead_time': -1.0,
+}
 
 
 _GROUND_TRUTH_ROBOT_INDEX = {'cbsoft_open': 0}

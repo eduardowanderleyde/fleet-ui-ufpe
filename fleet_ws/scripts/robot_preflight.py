@@ -108,7 +108,15 @@ def evaluate_nav2(advertised: Dict[str, List[str]]) -> Check:
     return Check("Nav2 já rodando", True, "nenhum (o fleet-ui sobe o próprio)")
 
 
-def run(listen_s: float, discovery_s: float) -> List[Check]:
+def robot_nodes(names, ignore_nodes=()) -> List[str]:
+    """Nós que podem ser do robô: tira este script, os nós que o chamador
+    disse serem do PC e os auxiliares do `ros2` CLI (_ros2cli_daemon_*,
+    _ros2cli_requester_*), que o backend da tela cria ao chamar serviços."""
+    ignored = {"fleet_robot_preflight", *ignore_nodes}
+    return sorted(n for n in names if n not in ignored and not n.startswith("_ros2cli"))
+
+
+def run(listen_s: float, discovery_s: float, ignore_nodes: tuple = ()) -> List[Check]:
     import rclpy
     from rclpy.node import Node
     from rclpy.qos import qos_profile_sensor_data
@@ -143,8 +151,12 @@ def run(listen_s: float, discovery_s: float) -> List[Check]:
     deadline = time.time() + discovery_s
     while time.time() < deadline:
         rclpy.spin_once(node, timeout_sec=0.1)
-    advertised = {name: types for name, types in node.get_topic_names_and_types()}
-    nodes = sorted(n for n, _ in node.get_node_names_and_namespaces() if n != "fleet_robot_preflight")
+    # Só tópicos com quem publique: rodando ao lado do backend da tela, as
+    # assinaturas dele (/tf, /amcl_pose, status das actions) também aparecem
+    # na lista e dariam OK sem robô nenhum na rede.
+    advertised = {name: types for name, types in node.get_topic_names_and_types()
+                  if node.count_publishers(name) > 0}
+    nodes = robot_nodes((n for n, _ in node.get_node_names_and_namespaces()), ignore_nodes)
     checks.append(Check("nós descobertos", bool(nodes),
                         f"{len(nodes)}: {', '.join(nodes[:8])}{' …' if len(nodes) > 8 else ''}"
                         if nodes else "nenhum — conferir rede, domínio e middleware"))
@@ -187,9 +199,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--discovery-sec", type=float, default=5.0, help="espera pela descoberta DDS")
     ap.add_argument("--listen-sec", type=float, default=5.0, help="janela para medir taxa e relógio")
+    ap.add_argument("--ignore-nodes", nargs="*", default=[],
+                    help="nós deste PC que não contam como robô (ex.: o do backend da tela)")
     args = ap.parse_args()
     print(f"Checagem pré-voo (só leitura) — domínio {os.environ.get('ROS_DOMAIN_ID', '0')}\n")
-    return report(run(args.listen_sec, args.discovery_sec))
+    return report(run(args.listen_sec, args.discovery_sec, tuple(args.ignore_nodes)))
 
 
 if __name__ == "__main__":
