@@ -19,3 +19,26 @@ describe('ConfigForm — replay', () => {
     expect(list).toHaveTextContent('total 95.2 m')
   })
 })
+
+describe('ConfigForm — modo robô real', () => {
+  const props = { onChange: () => {}, routeNames: ['percurso_cbsoft'], routesLoading: false, onRefreshRoutes: () => {} }
+
+  it('esconde o que é da simulação e mostra os tópicos fixos', () => {
+    render(<ConfigForm {...props} cfg={cfg} robotMode />)
+    expect(screen.queryByText('Robô')).not.toBeInTheDocument()
+    expect(screen.queryByText('ground_truth_pose_clean')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Retornar ao início/)).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Tópicos gravados')).toHaveTextContent('scan, odom, amcl_pose')
+  })
+
+  it('no Gravar, sem os percursos predefinidos (coordenadas da simulação)', () => {
+    render(<ConfigForm {...props} cfg={{ ...cfg, command: 'record' }} robotMode />)
+    expect(screen.queryByText('Percursos predefinidos')).not.toBeInTheDocument()
+  })
+
+  it('fora do modo robô, tudo continua lá', () => {
+    render(<ConfigForm {...props} cfg={cfg} />)
+    expect(screen.getByText('Robô')).toBeInTheDocument()
+    expect(screen.getByText(/Retornar ao início/)).toBeInTheDocument()
+  })
+})

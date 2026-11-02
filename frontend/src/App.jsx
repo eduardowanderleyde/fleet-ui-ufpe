@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import ConfigForm from './components/ConfigForm'
+import ConfigForm, { ROBOT_TOPICS } from './components/ConfigForm'
 import AgentFleetPanel from './components/AgentFleetPanel'
 import SimulationPanel from './components/SimulationPanel'
 import RobotPanel from './components/RobotPanel'
@@ -190,11 +190,17 @@ export default function App() {
     setError(null)
     if (!cfg.route.trim())                             { setError('Nome da rota vazio.'); return }
     if (cfg.command === 'record' && !cfg.points.length){ setError('Adiciona pelo menos 1 waypoint.'); return }
-    if (cfg.collect && !cfg.topics.length)             { setError('Seleciona pelo menos 1 tópico.'); return }
+    if (cfg.collect && !robotMode && !cfg.topics.length) { setError('Seleciona pelo menos 1 tópico.'); return }
 
     resetJob(); setRunning(true)
     try {
-      const data = await runConfig(cfg)
+      // Robô real: o que a tela esconde também não vai no pedido (um valor
+      // velho de outra sessão não pode, por exemplo, tirar o amcl_pose da
+      // gravação ou mandar o robô para um "retornar ao início" esquecido).
+      const payload = robotMode
+        ? { ...cfg, robot: 'default', topics: ROBOT_TOPICS, return_to_start: [0, 0, 0], ble_target_address: '' }
+        : cfg
+      const data = await runConfig(payload)
       if (!data?.job_id) { setRunning(false); setError(data?.message || 'Erro ao iniciar job'); return }
       startPolling(data.job_id)
     } catch (e) {
@@ -293,10 +299,11 @@ export default function App() {
               <span style={{ color: statColor, fontWeight: 600, marginTop: '0.05rem' }}>{value}</span>
             </div>
           ))}
-          <button onClick={resetToOrigin} disabled={resetting} aria-label="Enviar robô para a origem (0,0,0)" title="Envia robô para (0,0,0)"
+          {/* (0,0) do mapa do hall fica a ~16 m do START: no robô real, não. */}
+          {!robotMode && <button onClick={resetToOrigin} disabled={resetting} aria-label="Enviar robô para a origem (0,0,0)" title="Envia robô para (0,0,0)"
             style={{ background: 'none', border: 'none', cursor: resetting ? 'not-allowed' : 'pointer', padding: '0.3rem 0.75rem', color: resetMsg === 'ok' ? color.success : resetMsg ? color.danger : color.indigo, fontWeight: 700, fontSize: '0.8rem', opacity: resetting ? 0.6 : 1 }}>
             {resetting ? '⏳' : resetMsg === 'ok' ? '✓' : resetMsg ? '✗' : '⟳ Origem'}
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -373,6 +380,7 @@ export default function App() {
             routesError={routesError}
             onRefreshRoutes={refreshRoutes}
             routePoses={cfg.command === 'replay' ? replayPoses : []}
+            robotMode={robotMode}
           />
 
           {!isConnected && (

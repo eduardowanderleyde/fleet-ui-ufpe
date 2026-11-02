@@ -12,6 +12,10 @@ const ALL_TOPICS = [
   { id: 'ble_rssi', desc: 'força do sinal Bluetooth (BLE) — precisa do nó ble_rssi_publisher rodando' },
 ]
 
+// Robô real: grava sempre isto (posição no mapa do AMCL, laser e rodas). Os
+// outros tópicos da lista são da simulação ou não foram testados no robô.
+export const ROBOT_TOPICS = ['scan', 'odom', 'amcl_pose']
+
 const S = {
   label:    { fontSize: '0.72rem', fontWeight: 600, color: '#8b92a8', marginBottom: '0.3rem', display: 'block' },
   input:    { background: '#0d0f14', border: '1px solid #2a3142', borderRadius: '6px', color: '#e6e9ef', padding: '0.4rem 0.6rem', fontSize: '0.85rem', outline: 'none', fontFamily: 'monospace', width: '100%', boxSizing: 'border-box' },
@@ -125,6 +129,8 @@ export default function ConfigForm({
   routesError = null,
   onRefreshRoutes,
   routePoses = [],
+  // Modo robô real: esconde o que é da simulação ou mexe no robô sem querer.
+  robotMode = false,
 }) {
   const set = (key, val) => onChange({ ...cfg, [key]: val })
 
@@ -151,14 +157,16 @@ export default function ConfigForm({
             <span style={S.label}>Comando</span>
             <CmdToggle value={cfg.command} onChange={v => set('command', v)} />
           </div>
-          <div style={{ ...S.field, flex: '0 0 110px' }}>
-            <span style={S.label}>Robô</span>
-            <select value={cfg.robot} onChange={e => set('robot', e.target.value)} style={S.select}>
-              <option value="default">único</option>
-              <option value="tb1">tb1</option>
-              <option value="tb2">tb2</option>
-            </select>
-          </div>
+          {!robotMode && (
+            <div style={{ ...S.field, flex: '0 0 110px' }}>
+              <span style={S.label}>Robô</span>
+              <select value={cfg.robot} onChange={e => set('robot', e.target.value)} style={S.select}>
+                <option value="default">único</option>
+                <option value="tb1">tb1</option>
+                <option value="tb2">tb2</option>
+              </select>
+            </div>
+          )}
         </div>
         <div style={S.field}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -191,7 +199,12 @@ export default function ConfigForm({
           <input type="checkbox" checked={cfg.collect} onChange={e => set('collect', e.target.checked)} style={{ accentColor: '#6ee7b7', width: 16, height: 16 }} />
           <span style={{ fontSize: '0.85rem', color: cfg.collect ? '#6ee7b7' : '#8b92a8', fontWeight: 600 }}>Gravar bag</span>
         </label>
-        {cfg.collect && (
+        {cfg.collect && robotMode && (
+          <span aria-label="Tópicos gravados" style={{ fontSize: '0.75rem', color: '#a0aec0' }}>
+            Grava <code>{ROBOT_TOPICS.join(', ')}</code>: laser, rodas e a posição no mapa (de onde sai o CSV).
+          </span>
+        )}
+        {cfg.collect && !robotMode && (
           <div>
             <span style={S.label}>Tópicos</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
@@ -246,7 +259,7 @@ export default function ConfigForm({
         <XYYaw value={cfg.initial_pose} onChange={v => set('initial_pose', v)} />
       </div>
 
-      <div style={S.section}>
+      {(cfg.command === 'record' || !robotMode) && <div style={S.section}>
         {cfg.command === 'record' ? (
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -257,7 +270,9 @@ export default function ConfigForm({
               </button>
             </div>
 
-            <div>
+            {/* Coordenadas da simulação (ex.: 1,0): no mapa do hall caem a ~16 m do
+                START, então somem no modo robô. */}
+            {!robotMode && <div>
               <span style={{ ...S.label, marginBottom: '0.4rem' }}>Percursos predefinidos</span>
               <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                 {[
@@ -275,14 +290,14 @@ export default function ConfigForm({
                   </button>
                 ))}
               </div>
-            </div>
+            </div>}
 
             <WaypointList points={cfg.points} onChange={v => set('points', v)} />
           </>
         ) : (
           <XYYaw label="Retornar ao início antes do replay" value={cfg.return_to_start} onChange={v => set('return_to_start', v)} />
         )}
-      </div>
+      </div>}
     </div>
   )
 }

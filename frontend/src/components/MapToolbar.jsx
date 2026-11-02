@@ -116,7 +116,7 @@ export default function MapToolbar({
                     color: hoverCoord ? color.blue : color.textFaint3, minWidth: '120px', textAlign: 'right' }}>
         {hoverCoord
           ? `x ${hoverCoord.x.toFixed(2)}  y ${hoverCoord.y.toFixed(2)}`
-          : mapOk ? 'scroll=zoom  btn2=pan' : <span style={{ color: color.warning }}>⏳ aguardando SLAM…</span>
+          : mapOk ? 'scroll=zoom  btn2=pan' : <span style={{ color: color.warning }}>⏳ aguardando mapa…</span>
         }
       </div>
     </div>
