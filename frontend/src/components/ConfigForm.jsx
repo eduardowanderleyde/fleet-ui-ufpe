@@ -41,6 +41,27 @@ function CmdToggle({ value, onChange }) {
   )
 }
 
+// Pontos da rota escolhida para replay, só para ver: mesma numeração do mapa,
+// com a distância desde o ponto anterior (no percurso_cbsoft, os 64 m e 31 m do "L").
+function RoutePointsView({ poses }) {
+  if (!poses?.length) return null
+  const legs = poses.map((p, i) => i === 0 ? 0 : Math.hypot(p[0] - poses[i - 1][0], p[1] - poses[i - 1][1]))
+  const total = legs.reduce((a, b) => a + b, 0)
+  const num = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '1.15rem', height: '1.15rem', borderRadius: '50%', background: '#6366f1', color: '#fff', fontSize: '0.66rem', fontWeight: 700 }
+  return (
+    <div aria-label="Pontos da rota" style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', marginTop: '0.35rem' }}>
+      {poses.map((p, i) => (
+        <div key={i} style={{ display: 'grid', gridTemplateColumns: '1.3rem minmax(0, 1fr) auto', alignItems: 'center', gap: '0.35rem', fontSize: '0.7rem', fontFamily: 'monospace', color: '#a0aec0' }}>
+          <span style={num}>{i + 1}</span>
+          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>({p[0].toFixed(2)}, {p[1].toFixed(2)})</span>
+          <span style={{ color: '#6b7280' }}>{i === 0 ? 'início' : `+${legs[i].toFixed(1)} m`}</span>
+        </div>
+      ))}
+      <span style={{ fontSize: '0.7rem', color: '#8b92a8', textAlign: 'right' }}>total {total.toFixed(1)} m</span>
+    </div>
+  )
+}
+
 function WaypointList({ points, onChange }) {
   const update = (i, j, val) => onChange(points.map((p, pi) => pi === i ? p.map((v, vi) => vi === j ? parseFloat(val) || 0 : v) : p))
   const add    = ()  => onChange([...points, [0, 0, 0]])
@@ -103,6 +124,7 @@ export default function ConfigForm({
   routesLoading = false,
   routesError = null,
   onRefreshRoutes,
+  routePoses = [],
 }) {
   const set = (key, val) => onChange({ ...cfg, [key]: val })
 
@@ -156,6 +178,7 @@ export default function ConfigForm({
                 {routeNames.map(route => <option key={route} value={route}>{route}</option>)}
               </select>
               {routesError && <span style={{ color: '#fbbf24', fontSize: '0.72rem' }}>Rotas indisponíveis: {routesError}</span>}
+              <RoutePointsView poses={routePoses} />
             </>
           ) : (
             <input value={cfg.route} onChange={e => set('route', e.target.value)} placeholder="percurso_initial" style={S.input} />

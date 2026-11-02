@@ -372,6 +372,7 @@ export default function App() {
             routesLoading={routesLoading}
             routesError={routesError}
             onRefreshRoutes={refreshRoutes}
+            routePoses={cfg.command === 'replay' ? replayPoses : []}
           />
 
           {!isConnected && (
