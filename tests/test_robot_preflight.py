@@ -1,3 +1,4 @@
+import os
 import sys
 import unittest
 from pathlib import Path
@@ -57,6 +58,75 @@ class RobotPreflightRulesTests(unittest.TestCase):
         ok = [rp.Check("a", True, ""), rp.Check("b", False, "", warn_only=True)]
         self.assertEqual(rp.report(ok), 0)
         self.assertEqual(rp.report(ok + [rp.Check("c", False, "")]), 1)
+
+
+class RobotPreflightNamespaceTests(unittest.TestCase):
+    """Testes para suporte a namespace do robô."""
+    
+    def tearDown(self):
+        if "ROBOT_NAMESPACE" in os.environ:
+            del os.environ["ROBOT_NAMESPACE"]
+    
+    def test_get_namespace_empty(self):
+        if "ROBOT_NAMESPACE" in os.environ:
+            del os.environ["ROBOT_NAMESPACE"]
+        self.assertEqual(rp._get_namespace(), "")
+    
+    def test_get_namespace_set(self):
+        os.environ["ROBOT_NAMESPACE"] = "tb1"
+        self.assertEqual(rp._get_namespace(), "tb1")
+    
+    def test_get_namespace_strips_slashes(self):
+        os.environ["ROBOT_NAMESPACE"] = "/tb1/"
+        self.assertEqual(rp._get_namespace(), "tb1")
+    
+    def test_topic_with_ns_adds_prefix(self):
+        self.assertEqual(rp._topic_with_ns("scan", "tb1"), "/tb1/scan")
+        self.assertEqual(rp._topic_with_ns("/scan", "tb1"), "/tb1/scan")
+        self.assertEqual(rp._topic_with_ns("odom", "tb1"), "/tb1/odom")
+    
+    def test_topic_with_ns_no_prefix_when_empty(self):
+        self.assertEqual(rp._topic_with_ns("scan", ""), "/scan")
+        self.assertEqual(rp._topic_with_ns("/scan", ""), "/scan")
+    
+    def test_expected_topics_with_ns_all_prefixed(self):
+        topics = rp._expected_topics_with_ns("tb1")
+        self.assertIn("/tb1/scan", topics)
+        self.assertIn("/tb1/odom", topics)
+        self.assertIn("/tb1/tf", topics)
+        self.assertIn("/tb1/tf_static", topics)
+        self.assertNotIn("/scan", topics)
+        self.assertNotIn("/odom", topics)
+    
+    def test_expected_topics_without_ns_global(self):
+        topics = rp._expected_topics_with_ns("")
+        self.assertIn("/scan", topics)
+        self.assertIn("/odom", topics)
+        self.assertIn("/tf", topics)
+        self.assertNotIn("/tb1/scan", topics)
+    
+    def test_evaluate_types_with_namespace(self):
+        advertised = {
+            "/tb1/scan": ["sensor_msgs/msg/LaserScan"],
+            "/tb1/odom": ["nav_msgs/msg/Odometry"],
+            "/tb1/tf": ["tf2_msgs/msg/TFMessage"],
+            "/tb1/tf_static": ["tf2_msgs/msg/TFMessage"],
+        }
+        checks = rp.evaluate_types(advertised, namespace="tb1")
+        by_name = {c.name: c for c in checks}
+        self.assertTrue(by_name["tópico /tb1/scan"].ok)
+        self.assertTrue(by_name["tópico /tb1/odom"].ok)
+        self.assertTrue(by_name["tópico /tb1/tf"].ok)
+        self.assertTrue(by_name["tópico /tb1/tf_static"].ok)
+    
+    def test_evaluate_types_missing_namespaced_topic(self):
+        advertised = {
+            "/tb1/scan": ["sensor_msgs/msg/LaserScan"],
+        }
+        checks = rp.evaluate_types(advertised, namespace="tb1")
+        by_name = {c.name: c for c in checks}
+        self.assertTrue(by_name["tópico /tb1/scan"].ok)
+        self.assertFalse(by_name["tópico /tb1/odom"].ok)
 
 
 if __name__ == "__main__":

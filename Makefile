@@ -78,25 +78,46 @@ cbsoft-analise:
 # Checagem pré-voo contra o TurtleBot4 real (só escuta, não publica nada).
 # O robô do CIn usa domínio 0 e CycloneDDS; ajuste se mudar:
 #   make robot-check ROBOT_DOMAIN=0 ROBOT_RMW=rmw_cyclonedds_cpp
+#
+# ROBOT_NAMESPACE: namespace do robô (ex.: tb1 para /tb1/scan, /tb1/odom).
+#   O TurtleBot4 do CIn publica com namespace /tb1:
+#   make robot-check ROBOT_NAMESPACE=tb1
+#
+# ROBOT_IP (opcional): IP do robô para Cyclone DDS unicast.
+#   Só necessário se multicast não funcionar na rede (raro).
+#   make robot-check ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
 ROBOT_DOMAIN ?= 0
 ROBOT_RMW ?= rmw_cyclonedds_cpp
+ROBOT_NAMESPACE ?=
+ROBOT_IP ?=
+
 robot-check:
-	$(COMPOSE) run --rm --no-deps -e ROS_DOMAIN_ID=$(ROBOT_DOMAIN) -e RMW_IMPLEMENTATION=$(ROBOT_RMW) \
-		-e TZ=$(TZ_LOCAL) -v $(CURDIR)/fleet_ws/scripts:/workspace/fleet_ws/scripts:ro -w /workspace/fleet_ws backend \
+	$(COMPOSE) run --rm --no-deps \
+		-e ROS_DOMAIN_ID=$(ROBOT_DOMAIN) \
+		-e RMW_IMPLEMENTATION=$(ROBOT_RMW) \
+		-e ROBOT_NAMESPACE=$(ROBOT_NAMESPACE) \
+		-e TZ=$(TZ_LOCAL) \
+		-v $(CURDIR)/fleet_ws/scripts:/workspace/fleet_ws/scripts:ro \
+		-w /workspace/fleet_ws backend \
 		bash -c "source /opt/ros/jazzy/setup.bash && python3 scripts/robot_preflight.py"
 
 # Fleet UI contra o TurtleBot4 real. `make robot-up` sobe só o backend e a tela,
 # no domínio e middleware do robô; na tela, o painel "Robô real" recebe o IP,
 # confere a rede, roda a checagem pré-voo e liga mapa hall_cin_v4 + AMCL + Nav2
-# no PC (Reconectar refaz tudo). ROBOT_IP só preenche o campo:
+# no PC (Reconectar refaz tudo). ROBOT_IP só preenche o campo da tela:
 #   make robot-up ROBOT_IP=192.168.50.11
+#
+# Com namespace do robô (TurtleBot4 CIn com /tb1/*):
+#   make robot-up ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
+#
 # Plano B, o jeito antigo (tudo sobe já no terminal, sem o painel):
-#   make robot-check && make robot-up-terminal
+#   make robot-check ROBOT_NAMESPACE=tb1 && make robot-up-terminal ROBOT_NAMESPACE=tb1
+#
 # Ao conectar, o robô gira ~10° e volta, no lugar (ROBOT_CONNECT_WIGGLE=false desliga).
-ROBOT_IP ?=
 ROBOT_CONNECT_WIGGLE ?= true
 ROBOT_ENV = ROS_DOMAIN_ID=$(ROBOT_DOMAIN) RMW_IMPLEMENTATION=$(ROBOT_RMW) TZ=$(TZ_LOCAL) \
-	NAV2_CONTROLLER=$(NAV2_CONTROLLER) ROBOT_IP=$(ROBOT_IP) ROBOT_CONNECT_WIGGLE=$(ROBOT_CONNECT_WIGGLE)
+	NAV2_CONTROLLER=$(NAV2_CONTROLLER) ROBOT_IP=$(ROBOT_IP) ROBOT_CONNECT_WIGGLE=$(ROBOT_CONNECT_WIGGLE) \
+	ROBOT_NAMESPACE=$(ROBOT_NAMESPACE)
 ROBOT_COMPOSE = $(COMPOSE) -f docker-compose.yml -f docker-compose.robot.yml
 
 robot-up:
