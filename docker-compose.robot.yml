@@ -12,6 +12,7 @@ x-robot-env: &robot-env
   RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
   FLEET_USE_SIM_TIME: "false"
   ROBOT_NAMESPACE: ${ROBOT_NAMESPACE:-}
+  ROS_DISTRO: ${ROS_DISTRO:-jazzy}
 
 services:
   sim:

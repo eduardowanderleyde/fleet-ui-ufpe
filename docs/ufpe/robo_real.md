@@ -2,6 +2,14 @@
 
 Este documento descreve como conectar o fleet-ui a um TurtleBot4 real no laboratório do CIn-UFPE.
 
+## ⚠️ IMPORTANTE: Use a Imagem HUMBLE para o Robô Real
+
+**O robô usa ROS 2 Humble e NÃO é compatível com Jazzy via DDS.**
+
+Diagnóstico de campo (10/11/2026): o container Jazzy no PC não consegue descobrir o robô Humble, mesmo com multicast funcionando. A incompatibilidade é no nível do DDS entre versões diferentes do ROS 2.
+
+**Solução**: usar a imagem `fleet-ui:humble` para conectar ao robô real.
+
 ## Configuração do Robô
 
 O TurtleBot4 do CIn tem a seguinte configuração:
@@ -12,12 +20,27 @@ O TurtleBot4 do CIn tem a seguinte configuração:
 - **IP wlan0**: 192.168.50.11 (rede Wi-Fi do lab)
 - **IP usb0**: 192.168.186.3 (conexão USB com a base Create3, inalcançável do PC)
 
-## Uso Rápido
+## Uso Rápido (Comandos para Rodar Agora)
 
-### Checagem pré-voo (sem mover o robô)
+### 1. Atualizar o código (se necessário)
 
 ```bash
-make robot-check ROBOT_NAMESPACE=tb1
+cd ~/fleet-ui-ufpe   # ou onde estiver o repositório
+git fetch origin
+git checkout cursor/turtlebot4-real-namespace-5a9d
+git pull origin cursor/turtlebot4-real-namespace-5a9d
+```
+
+### 2. Build da imagem Humble (primeira vez, ~15-20 min)
+
+```bash
+make robot-build-humble
+```
+
+### 3. Checagem pré-voo (sem mover o robô)
+
+```bash
+make robot-check-humble ROBOT_NAMESPACE=tb1
 ```
 
 Este comando verifica:
@@ -27,10 +50,10 @@ Este comando verifica:
 - Se o relógio está sincronizado entre PC e robô
 - Se o TF odom→base_link está disponível
 
-### Subir o Fleet-UI contra o robô
+### 4. Subir o Fleet-UI contra o robô
 
 ```bash
-make robot-up ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
+make robot-up-humble ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
 ```
 
 O `ROBOT_IP` preenche o campo de IP na tela. Depois de subir:
@@ -38,6 +61,23 @@ O `ROBOT_IP` preenche o campo de IP na tela. Depois de subir:
 2. No painel "Robô real", clique em "Conectar"
 3. O fleet-ui roda a checagem pré-voo automaticamente
 4. Se passar, sobe mapa + AMCL + Nav2 no PC
+
+## Comandos Resumidos
+
+| Ação | Comando |
+|------|---------|
+| Build Humble (1x) | `make robot-build-humble` |
+| Checagem | `make robot-check-humble ROBOT_NAMESPACE=tb1` |
+| Subir UI | `make robot-up-humble ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11` |
+
+## Por que Humble?
+
+A imagem Jazzy (padrão) é usada para **simulação**. Para o **robô real**, use Humble porque:
+
+1. O TurtleBot4 roda ROS 2 Humble
+2. O DDS do Jazzy não consegue descobrir nós Humble (incompatibilidade confirmada em campo)
+3. As mensagens (LaserScan, Odometry, TF) são compatíveis entre versões
+4. Só a descoberta DDS falha entre versões diferentes
 
 ## Como Funciona
 
@@ -64,46 +104,44 @@ Isso é o comportamento padrão do `robot_state_publisher`. Se o robô estiver c
 
 ## Compatibilidade Humble ↔ Jazzy
 
-⚠️ **AVISO**: ROS 2 Humble (robô) e Jazzy (PC/fleet-ui) **não são oficialmente compatíveis**.
+⚠️ **CONFIRMADO EM CAMPO (10/11/2026)**: ROS 2 Humble (robô) e Jazzy (PC) **NÃO conseguem se descobrir via DDS**.
 
-Na prática, funciona para a maioria dos casos porque:
-- As mensagens de sensores (LaserScan, Odometry, TFMessage, Twist) não mudaram entre versões
-- O DDS (CycloneDDS) é o mesmo
+O diagnóstico mostrou que:
+- Multicast funciona normalmente entre PC e robô
+- O container Jazzy no PC só vê `/parameter_events` e `/rosout`
+- O mesmo container descobre normalmente robôs ROS de outros grupos na rede do lab
+- **Conclusão**: incompatibilidade de descoberta DDS entre versões
 
-Mas pode haver problemas de descoberta DDS ou timing em alguns cenários.
+**Solução implementada**: imagem `fleet-ui:humble` para o robô real.
 
-### Fallback: Imagem Humble no PC
-
-Se a checagem pré-voo falhar consistentemente com erros de descoberta ou tipos de mensagem, considere rodar o fleet-ui com uma imagem baseada em Humble em vez de Jazzy:
-
-1. Altere o `Dockerfile` para usar `ros:humble` como base
-2. Rebuild: `make docker-build`
-3. Teste novamente
-
-Isso não está implementado nesta branch, mas é um caminho de fallback documentado.
+A imagem Jazzy continua sendo usada para simulação (Gazebo, Nav2 simulado).
 
 ## Troubleshooting
 
 ### "Nenhum nó do robô descoberto"
 
-Possíveis causas (em ordem de probabilidade):
+**Causa mais provável**: Você está usando a imagem **Jazzy** para conectar ao robô **Humble**.
+
+**Solução**:
+```bash
+make robot-build-humble   # se ainda não fez
+make robot-check-humble ROBOT_NAMESPACE=tb1
+```
+
+Outras causas possíveis:
 
 1. **Namespace errado**: O robô publica em `/tb1/*` mas `ROBOT_NAMESPACE` não está definido
-   - Solução: `make robot-check ROBOT_NAMESPACE=tb1`
+   - Solução: `make robot-check-humble ROBOT_NAMESPACE=tb1`
 
-2. **Incompatibilidade Humble/Jazzy**: Versões diferentes do DDS podem não se descobrir
-   - Verifique se ambos usam CycloneDDS: `echo $RMW_IMPLEMENTATION`
-   - Considere o fallback para imagem Humble
-
-3. **Domínio ROS diferente**: O robô pode estar em outro domínio
+2. **Domínio ROS diferente**: O robô pode estar em outro domínio
    - Verifique no robô: `echo $ROS_DOMAIN_ID`
-   - Use: `make robot-check ROBOT_NAMESPACE=tb1 ROBOT_DOMAIN=<n>`
+   - Use: `make robot-check-humble ROBOT_NAMESPACE=tb1 ROBOT_DOMAIN=<n>`
 
-4. **Rede**: PC e robô em redes diferentes
+3. **Rede**: PC e robô em redes diferentes
    - Verifique se consegue pingar o robô: `ping 192.168.50.11`
 
-5. **Multicast bloqueado** (raro nesta rede): Se multicast não funcionar
-   - Use Cyclone DDS com peers unicast (ver seção abaixo)
+4. **Multicast bloqueado** (raro nesta rede - confirmado que funciona)
+   - Só se for um ambiente de rede diferente
 
 ### Cyclone DDS Unicast (opcional)
 
@@ -185,3 +223,19 @@ O `analyze_runs.py` reconhece automaticamente tópicos com namespace (procura po
 | `ROBOT_DOMAIN`    | Domínio ROS (default: 0)                       | `0`             |
 | `ROBOT_RMW`       | Middleware ROS (default: rmw_cyclonedds_cpp)   | `rmw_cyclonedds_cpp` |
 | `ROBOT_MAP`       | Mapa a usar (default: hall_cin_v4)             | `hall_cin_v4`   |
+| `ROS_DISTRO`      | Distro ROS (humble para robô, jazzy para sim)  | `humble`        |
+
+## Caderno de Campo
+
+### 10/11/2026 - Diagnóstico de Compatibilidade
+
+**Fato**: O container Jazzy não consegue descobrir o robô Humble via DDS.
+
+**Teste realizado**:
+- `ros2 topic list` no container Jazzy mostra apenas `/parameter_events` e `/rosout`
+- O mesmo container descobre robôs de outros grupos na rede do lab
+- Multicast entre PC e robô funciona (testado com `ros2 multicast send/receive`)
+
+**Conclusão**: Incompatibilidade de descoberta DDS entre Humble e Jazzy.
+
+**Solução**: Usar imagem `fleet-ui:humble` para o robô real.

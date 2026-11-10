@@ -1,0 +1,23 @@
+# Override para usar a imagem Humble (robô real).
+# Usado automaticamente por `make robot-*-humble`.
+#
+# A imagem Humble é construída com:
+#   make robot-build-humble
+#
+# Uso:
+#   make robot-up-humble ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
+
+x-humble-image: &humble-image
+  image: fleet-ui:humble
+
+services:
+  sim:
+    <<: *humble-image
+  fleet:
+    <<: *humble-image
+  backend:
+    <<: *humble-image
+    environment:
+      ROS_DISTRO: humble
+  frontend:
+    <<: *humble-image
