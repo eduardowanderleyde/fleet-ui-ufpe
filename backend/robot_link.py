@@ -90,7 +90,11 @@ def clock_command(ip: str) -> str:
 
 def launch_commands(env: dict) -> list[tuple[str, list[str]]]:
     """Os dois launches do antigo `make robot-up`: lado do PC (mapa + AMCL +
-    Nav2, ver docker/run-robot.sh) e o orquestrador (docker/run-fleet.sh)."""
+    Nav2, ver docker/run-robot.sh) e o orquestrador (docker/run-fleet.sh).
+    
+    O ROBOT_NAMESPACE é passado via variável de ambiente (já está no env do
+    processo), não como argumento do launch — o turtlebot4_real.launch.py lê
+    diretamente de os.environ.get("ROBOT_NAMESPACE")."""
     robot = ["ros2", "launch", "fleet_orchestrator", "turtlebot4_real.launch.py",
              f"map:={env.get('ROBOT_MAP') or 'hall_cin_v4'}",
              f"x_pose:={env.get('X_POSE') or '1.0216323137283325'}",
@@ -215,10 +219,11 @@ class RobotLink:
         script = os.path.join(self._ros_ws, "scripts", "robot_preflight.py")
         cmd = " ".join(shlex.quote(c) for c in
                        ["python3", script, "--ignore-nodes", *BACKEND_NODES])
+        env = {**self._ros_env(), "PYTHONUNBUFFERED": "1"}
         result = subprocess.run(
             ["bash", "-c", self._setup_prefix() + cmd],
             capture_output=True, text=True, timeout=PREFLIGHT_TIMEOUT_S,
-            cwd=self._ros_ws, env={**self._ros_env(), "PYTHONUNBUFFERED": "1"},
+            cwd=self._ros_ws, env=env,
         )
         return (result.stdout or "") + (result.stderr or ""), result.returncode
 

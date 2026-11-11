@@ -3,10 +3,16 @@
 # O serviço "sim" deixa de subir o Gazebo e sobe só mapa + AMCL + Nav2 contra o
 # TurtleBot4 de verdade; fleet/backend usam o relógio do sistema e o mesmo
 # middleware do robô (CycloneDDS no CIn).
+#
+# ROBOT_NAMESPACE: namespace do robô (ex.: tb1 para /tb1/scan, /tb1/odom).
+#   O TurtleBot4 do CIn publica com namespace /tb1.
+#   make robot-up ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
 x-robot-env: &robot-env
   ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-0}
   RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
   FLEET_USE_SIM_TIME: "false"
+  ROBOT_NAMESPACE: ${ROBOT_NAMESPACE:-}
+  ROS_DISTRO: ${ROS_DISTRO:-jazzy}
 
 services:
   sim:

@@ -1,5 +1,11 @@
 COMPOSE ?= docker compose
 
+# ROS_DISTRO: jazzy (simulação, padrão) ou humble (robô real TurtleBot4).
+# O robô usa Humble e não é compatível com Jazzy via DDS.
+#   make robot-build-humble
+#   make robot-up-humble ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
+ROS_DISTRO ?= jazzy
+
 # Percurso do experimento BLE do CBSoft'26 num mundo aberto (ver fleet_ws/scripts/cbsoft/).
 # HEADLESS: sem a janela do Gazebo (o frontend mostra o robô); com ela a CPU
 # satura e o Nav2 aborta trajetos longos.
@@ -17,7 +23,7 @@ CBSOFT_ENV = ROS_DOMAIN_ID=$(CBSOFT_DOMAIN) WORLD=cbsoft_open LOCALIZATION=amcl 
 	NAV2_DEFAULT_SERVER_TIMEOUT_MS=1000 NAV2_NAVFN_USE_ASTAR=true NAV2_CONTROLLER=$(NAV2_CONTROLLER) \
 	X_POSE=1.0216323137283325 Y_POSE=16.61626625061035 YAW=0.0
 
-.PHONY: docker-build docker-up docker-down docker-logs docker-shell docker-check cbsoft-up cbsoft-run cbsoft-csv cbsoft-analise robot-check robot-up robot-up-terminal
+.PHONY: docker-build docker-up docker-down docker-logs docker-shell docker-check cbsoft-up cbsoft-run cbsoft-csv cbsoft-analise robot-check robot-up robot-up-terminal robot-build-humble robot-check-humble robot-up-humble
 
 # Fuso local no container: o Timestamp_Legivel do CSV precisa casar com o
 # horário do celular (log do nRF Connect), que é local.
@@ -78,25 +84,51 @@ cbsoft-analise:
 # Checagem pré-voo contra o TurtleBot4 real (só escuta, não publica nada).
 # O robô do CIn usa domínio 0 e CycloneDDS; ajuste se mudar:
 #   make robot-check ROBOT_DOMAIN=0 ROBOT_RMW=rmw_cyclonedds_cpp
+#
+# ROBOT_NAMESPACE: namespace do robô (ex.: tb1 para /tb1/scan, /tb1/odom).
+#   O TurtleBot4 do CIn publica com namespace /tb1:
+#   make robot-check ROBOT_NAMESPACE=tb1
+#
+# ROBOT_IP (opcional): IP do robô para Cyclone DDS unicast.
+#   Só necessário se multicast não funcionar na rede (raro).
+#   make robot-check ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
 ROBOT_DOMAIN ?= 0
 ROBOT_RMW ?= rmw_cyclonedds_cpp
+ROBOT_NAMESPACE ?=
+ROBOT_IP ?=
+
 robot-check:
-	$(COMPOSE) run --rm --no-deps -e ROS_DOMAIN_ID=$(ROBOT_DOMAIN) -e RMW_IMPLEMENTATION=$(ROBOT_RMW) \
-		-e TZ=$(TZ_LOCAL) -v $(CURDIR)/fleet_ws/scripts:/workspace/fleet_ws/scripts:ro -w /workspace/fleet_ws backend \
-		bash -c "source /opt/ros/jazzy/setup.bash && python3 scripts/robot_preflight.py"
+	$(COMPOSE) run --rm --no-deps \
+		-e ROS_DOMAIN_ID=$(ROBOT_DOMAIN) \
+		-e RMW_IMPLEMENTATION=$(ROBOT_RMW) \
+		-e ROBOT_NAMESPACE=$(ROBOT_NAMESPACE) \
+		-e ROS_DISTRO=$(ROS_DISTRO) \
+		-e TZ=$(TZ_LOCAL) \
+		-v $(CURDIR)/fleet_ws/scripts:/workspace/fleet_ws/scripts:ro \
+		-w /workspace/fleet_ws backend \
+		bash -c "source /opt/ros/$(ROS_DISTRO)/setup.bash && python3 scripts/robot_preflight.py"
 
 # Fleet UI contra o TurtleBot4 real. `make robot-up` sobe só o backend e a tela,
 # no domínio e middleware do robô; na tela, o painel "Robô real" recebe o IP,
 # confere a rede, roda a checagem pré-voo e liga mapa hall_cin_v4 + AMCL + Nav2
-# no PC (Reconectar refaz tudo). ROBOT_IP só preenche o campo:
+# no PC (Reconectar refaz tudo). ROBOT_IP só preenche o campo da tela:
 #   make robot-up ROBOT_IP=192.168.50.11
-# Plano B, o jeito antigo (tudo sobe já no terminal, sem o painel):
-#   make robot-check && make robot-up-terminal
+#
+# Com namespace do robô (TurtleBot4 CIn com /tb1/*):
+#   make robot-up ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
+#
+# ══════════════════════════════════════════════════════════════════════════════
+# ROBÔ REAL: USE HUMBLE (Jazzy não descobre o robô Humble via DDS)
+# ══════════════════════════════════════════════════════════════════════════════
+#   make robot-build-humble                              # build da imagem (~15-20 min)
+#   make robot-check-humble ROBOT_NAMESPACE=tb1          # checagem pré-voo
+#   make robot-up-humble ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
+#
 # Ao conectar, o robô gira ~10° e volta, no lugar (ROBOT_CONNECT_WIGGLE=false desliga).
-ROBOT_IP ?=
 ROBOT_CONNECT_WIGGLE ?= true
 ROBOT_ENV = ROS_DOMAIN_ID=$(ROBOT_DOMAIN) RMW_IMPLEMENTATION=$(ROBOT_RMW) TZ=$(TZ_LOCAL) \
-	NAV2_CONTROLLER=$(NAV2_CONTROLLER) ROBOT_IP=$(ROBOT_IP) ROBOT_CONNECT_WIGGLE=$(ROBOT_CONNECT_WIGGLE)
+	NAV2_CONTROLLER=$(NAV2_CONTROLLER) ROBOT_IP=$(ROBOT_IP) ROBOT_CONNECT_WIGGLE=$(ROBOT_CONNECT_WIGGLE) \
+	ROBOT_NAMESPACE=$(ROBOT_NAMESPACE) ROS_DISTRO=$(ROS_DISTRO)
 ROBOT_COMPOSE = $(COMPOSE) -f docker-compose.yml -f docker-compose.robot.yml
 
 robot-up:
@@ -108,3 +140,36 @@ robot-up-terminal:
 	mkdir -p fleet_ws/routes/default
 	cp fleet_ws/scripts/cbsoft/percurso_cbsoft.yaml fleet_ws/routes/default/
 	$(ROBOT_ENV) FLEET_ROBOT_MODE=false $(ROBOT_COMPOSE) up
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TARGETS HUMBLE — para o robô real (incompatível com Jazzy via DDS)
+# ══════════════════════════════════════════════════════════════════════════════
+HUMBLE_IMAGE = fleet-ui:humble
+
+robot-build-humble:
+	docker build -f Dockerfile.humble -t $(HUMBLE_IMAGE) .
+
+# Compose override para usar a imagem Humble
+HUMBLE_COMPOSE = $(COMPOSE) -f docker-compose.yml -f docker-compose.robot.yml -f docker-compose.humble.yml
+
+robot-check-humble:
+	$(HUMBLE_COMPOSE) run --rm --no-deps \
+		-e ROS_DOMAIN_ID=$(ROBOT_DOMAIN) \
+		-e RMW_IMPLEMENTATION=$(ROBOT_RMW) \
+		-e ROBOT_NAMESPACE=$(ROBOT_NAMESPACE) \
+		-e ROS_DISTRO=humble \
+		-e TZ=$(TZ_LOCAL) \
+		-v $(CURDIR)/fleet_ws/scripts:/workspace/fleet_ws/scripts:ro \
+		-v $(CURDIR)/backend:/workspace/backend:ro \
+		-w /workspace/fleet_ws backend \
+		bash -c "source /opt/ros/humble/setup.bash && python3 scripts/robot_preflight.py"
+
+robot-up-humble:
+	mkdir -p fleet_ws/routes/default
+	cp fleet_ws/scripts/cbsoft/percurso_cbsoft.yaml fleet_ws/routes/default/
+	ROS_DISTRO=humble $(ROBOT_ENV) FLEET_ROBOT_MODE=true BACKEND_START_DELAY=2 $(HUMBLE_COMPOSE) up --no-deps backend frontend
+
+robot-up-humble-terminal:
+	mkdir -p fleet_ws/routes/default
+	cp fleet_ws/scripts/cbsoft/percurso_cbsoft.yaml fleet_ws/routes/default/
+	ROS_DISTRO=humble $(ROBOT_ENV) FLEET_ROBOT_MODE=false $(HUMBLE_COMPOSE) up

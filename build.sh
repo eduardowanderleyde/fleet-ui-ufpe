@@ -6,8 +6,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/fleet_ws"
 
-echo "[build] Sourcing ROS 2 Jazzy..."
-source /opt/ros/jazzy/setup.bash
+ROS_DISTRO="${ROS_DISTRO:-jazzy}"
+echo "[build] Sourcing ROS 2 ${ROS_DISTRO}..."
+source /opt/ros/${ROS_DISTRO}/setup.bash
 
 echo "[build] Building ROS 2 packages..."
 colcon build --symlink-install

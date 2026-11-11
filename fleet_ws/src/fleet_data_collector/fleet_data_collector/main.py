@@ -131,8 +131,16 @@ class SensorCollector(Node):
             durability=DurabilityPolicy.VOLATILE,
         )
 
+    def _preferred_storage_id(self) -> str:
+        """Retorna o storage preferido: mcap no Jazzy, sqlite3 no Humble."""
+        import os
+        distro = os.environ.get("ROS_DISTRO", "jazzy")
+        if distro == "humble":
+            return "sqlite3"
+        return "mcap"
+
     def _make_writer(self, bag_dir: str) -> SequentialWriter:
-        storage = StorageOptions(uri=bag_dir, storage_id="mcap")
+        storage = StorageOptions(uri=bag_dir, storage_id=self._preferred_storage_id())
         converter = ConverterOptions(
             input_serialization_format="cdr",
             output_serialization_format="cdr",
