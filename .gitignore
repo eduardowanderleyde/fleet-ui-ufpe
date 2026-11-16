@@ -22,3 +22,6 @@ __pycache__/
 *.swp
 *~
 .run_all_logs/
+
+# Conversas dos agentes (dados da pesquisa: fazer backup, não commitar)
+fleet_ws/agent_runs/

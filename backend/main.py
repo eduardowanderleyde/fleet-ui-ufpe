@@ -1582,6 +1582,9 @@ async def agent_run(body: AgentRunRequest):
         "instruction": instruction, "model": body.model, "started_at": _now_iso(), "finished_at": None,
     }
 
+    # Grava já no início: se o backend/PC fechar no meio, a conversa não se perde.
+    _save_agent_run(f"single_{job_id}", {"kind": "single", "job_id": job_id, **_agent_jobs[job_id]})
+
     async def _run_and_persist():
         await _execute_planner(_agent_jobs[job_id], instruction, body.model)
         _agent_jobs[job_id]["finished_at"] = _now_iso()
@@ -1619,6 +1622,9 @@ async def agent_run_fleet(body: AgentFleetRunRequest):
         "running": True, "robots": robots_state, "model": body.model,
         "started_at": _now_iso(), "finished_at": None,
     }
+
+    # Grava já no início: se o backend/PC fechar no meio, a conversa não se perde.
+    _save_agent_run(f"fleet_{job_id}", {"kind": "fleet", "job_id": job_id, **_fleet_jobs[job_id]})
 
     async def _run_all():
         await asyncio.gather(*(
@@ -1690,6 +1696,9 @@ async def agent_run_mission(body: AgentMissionRequest):
         },
     }
 
+    # Grava já no início: se o backend/PC fechar no meio, a conversa não se perde.
+    _save_agent_run(f"mission_{job_id}", {"kind": "mission", "job_id": job_id, **_agent_jobs[job_id]})
+
     async def _run_and_persist():
         await _execute_planner(_agent_jobs[job_id], mission, body.model, robot_id=decision.robot_id)
         _agent_jobs[job_id]["finished_at"] = _now_iso()
@@ -1749,6 +1758,9 @@ async def agent_run_mission_fleet(body: AgentMissionRequest):
         "running": True, "robots": robots_state, "model": body.model,
         "started_at": _now_iso(), "finished_at": None, "mission": mission,
     }
+
+    # Grava já no início: se o backend/PC fechar no meio, a conversa não se perde.
+    _save_agent_run(f"mission_fleet_{job_id}", {"kind": "mission_fleet", "job_id": job_id, **_fleet_jobs[job_id]})
 
     async def _run_all():
         await asyncio.gather(*(
