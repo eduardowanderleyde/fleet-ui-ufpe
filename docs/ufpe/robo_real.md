@@ -27,8 +27,8 @@ O TurtleBot4 do CIn tem a seguinte configuração:
 ```bash
 cd ~/fleet-ui-ufpe   # ou onde estiver o repositório
 git fetch origin
-git checkout cursor/turtlebot4-real-namespace-5a9d
-git pull origin cursor/turtlebot4-real-namespace-5a9d
+git checkout main
+git pull origin main   # o suporte a Humble e tb1 já está na main
 ```
 
 ### 2. Build da imagem Humble (primeira vez, ~15-20 min)
