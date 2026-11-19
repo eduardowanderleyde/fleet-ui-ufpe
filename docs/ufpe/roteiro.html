@@ -157,14 +157,14 @@ make robot-up-humble ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11</pre></div><p><c
         <tbody>
           <tr><td>rede</td><td>O PC não alcança o IP: confiram se o PC está na TurtleLab (passo 6) e se o IP é o do robô, não o do roteador.</td></tr>
           <tr><td>middleware</td><td>O robô precisa estar em CycloneDDS: <code>RMW_IMPLEMENTATION=rmw_cyclonedds_cpp</code> em <code>/etc/turtlebot4/setup.bash</code> e na base Create3, como no guia de vocês. Depois, <code>sudo systemctl restart turtlebot4.service</code> no robô.</td></tr>
-          <tr><td>nós descobertos</td><td>A rede passa, mas o ROS não acha o robô: domínio ou middleware. Se o robô não usa o domínio 0, desliguem com Ctrl+C e religuem com <code>make robot-up-humble ROBOT_NAMESPACE=tb1 ROBOT_DOMAIN=&lt;n&gt; ROBOT_IP=192.168.50.11</code>. Confiram também que ligaram com <code>robot-up-humble</code> e <code>ROBOT_NAMESPACE=tb1</code> (passo 9): com o <code>make robot-up</code> antigo, essa linha falha.</td></tr>
+          <tr><td>nós descobertos</td><td>A rede passa, mas o ROS não acha o robô: domínio ou middleware. Se o robô não usa o domínio 0, desliguem com Ctrl+C e religuem com <code>make robot-up-humble ROBOT_NAMESPACE=tb1 ROBOT_DOMAIN=&lt;n&gt; ROBOT_IP=192.168.50.11</code>. Confiram também que ligaram com <code>robot-up-humble</code>, <code>ROBOT_NAMESPACE=tb1</code> e <code>ROBOT_IP</code> (passo 9): com o <code>make robot-up</code> antigo, essa linha falha. Se tudo isso está certo e a linha ainda falha, falta o IP deste PC no arquivo do robô (<code>/etc/turtlebot4/cyclonedds_rpi.xml</code>): o passo a passo, com backup, está em <code>docs/ufpe/robo_real.md</code>, seção "Descoberta do DDS por unicast". É uma configuração feita uma vez só.</td></tr>
           <tr><td>relógio</td><td>Repetir o passo 8.</td></tr>
           <tr><td>TF odom → base_link</td><td>No robô: <code>sudo systemctl restart turtlebot4.service</code> (erro 1 do guia de vocês).</td></tr>
           <tr><td>taxa /scan ou /odom</td><td>Laser ou base sem publicar: reiniciar o serviço do robô, como acima.</td></tr>
           <tr><td>Nav2 já rodando (aviso)</td><td>Repetir o passo 7.</td></tr>
         </tbody>
       </table></div>
-      <p><b>Plano B</b>, se o painel não conectar por outro motivo: Ctrl+C no terminal do passo 9 e o jeito antigo, pelo terminal: <code>make robot-check-humble ROBOT_NAMESPACE=tb1</code> e, com tudo OK, <code>make robot-up-humble-terminal ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11</code>; depois, na tela, <b>Conectar robô</b> → <b>Custom (simulação local)</b> → <b>Conectar</b>.</p></div></li>
+      <p><b>Plano B</b>, se o painel não conectar por outro motivo: Ctrl+C no terminal do passo 9 e o jeito antigo, pelo terminal: <code>make robot-check-humble ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11</code> e, com tudo OK, <code>make robot-up-humble-terminal ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11</code>; depois, na tela, <b>Conectar robô</b> → <b>Custom (simulação local)</b> → <b>Conectar</b>.</p></div></li>
     <li><label><span class="box"><input type="checkbox" id="s12"><span class="num"></span></span><span class="what">Tela confere com o robô</span></label>
       <div class="detail"><p class="expect"><b>Esperado:</b> no alto da tela, <b>Nav2 ON</b> e posição perto de x = 1,02 e y = 16,62 (o START).</p><p>Se o robô estiver em outro lugar, informem a posição real no campo <b>Pose inicial</b> (ela é enviada ao AMCL no começo da execução, como o “2D Pose Estimate” do RViz).</p><p>A <b>Pose inicial</b> não move o robô: só diz ao AMCL onde ele está. Ela só é certa se o robô estiver de fato naquele ponto, virado na direção informada. O botão <b>⊕ Pose atual</b> copia onde o sistema já acha que o robô está; se essa posição estiver errada, ele copia o erro.</p></div></li>
     <li><label><span class="box"><input type="checkbox" id="s13"><span class="num"></span></span><span class="what">Executar liberado</span></label>
@@ -219,7 +219,7 @@ make cbsoft-analise NAV=collections/cbsoft/&lt;navegacao&gt;.csv NRF="collection
 
 <footer>
   <p>Até agora, a ligação com o robô foi testada com um robô falso, que publica laser, odometria e TF como o TurtleBot4: pelo painel Robô real, IP errado recusado, checagem OK, Nav2 ativo em cerca de 25 s, deslocamento de 1 m concluído, Reconectar sem deixar processos para trás, percurso com gravação de <code>/amcl_pose</code> e parada no meio funcionando. Esta é a primeira vez com o robô de verdade.</p>
-  <p>Atualizado em 15/11/2026: robô real com a versão Humble e <code>ROBOT_NAMESPACE=tb1</code>, depois do teste de 10/11.</p>
+  <p>Atualizado em 19/11/2026: robô real com a versão Humble, <code>ROBOT_NAMESPACE=tb1</code> e descoberta do DDS por unicast (<code>ROBOT_IP</code>).</p>
   <p>Fleet UI, repositório <code>fleet-ui-ufpe</code>. Dúvidas: falem com o Eduardo.</p>
   <button type="button" class="reset" id="reset">Desmarcar tudo</button>
 </footer>

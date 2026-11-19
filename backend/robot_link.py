@@ -7,8 +7,10 @@ terminal: confere se o IP responde, roda a checagem pré-voo
 (turtlebot4_real.launch.py) e o orquestrador (fleet.launch.py) como processos
 seus, como já faz com a simulação. Reconectar é desligar tudo e refazer.
 
-O IP serve para a checagem de rede e para o comando do relógio (ssh); o ROS
-continua achando o robô sozinho pelo DDS, como no `make robot-check`.
+O IP serve para a checagem de rede, para o comando do relógio (ssh) e para a
+descoberta do DDS: na rede do TurtleBot4 do CIn o multicast do DDS não chega ao
+PC (19/11/2026), então, com CycloneDDS, os processos que esta ligação sobe
+recebem um XML com o robô como peer unicast (fleet_ws/scripts/cyclone_unicast.py).
 """
 from __future__ import annotations
 
@@ -20,6 +22,7 @@ import signal
 import socket
 import subprocess
 import threading
+import sys
 import time
 from typing import Callable, Optional
 
@@ -83,6 +86,31 @@ def parse_preflight(output: str) -> list[dict]:
     return checks
 
 
+def dds_env(ip: str, env: dict, ros_ws: str) -> dict:
+    """Variáveis extras para achar o robô em `ip` por unicast (vazio se não se aplica).
+
+    Só com CycloneDDS, sem ROBOT_DDS_UNICAST=false, e sem um CYCLONEDDS_URI
+    escolhido à mão (o gerado pelo entrypoint pode ser trocado pelo do IP da tela).
+    """
+    if env.get("RMW_IMPLEMENTATION") != "rmw_cyclonedds_cpp":
+        return {}
+    if (env.get("ROBOT_DDS_UNICAST") or "true").strip().lower() in ("false", "0", "no"):
+        return {}
+    scripts = os.path.join(ros_ws, "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    import cyclone_unicast  # fleet_ws/scripts
+
+    current = env.get("CYCLONEDDS_URI", "")
+    if current and cyclone_unicast.DEFAULT_OUT not in current and "fleet_cyclonedds_robot" not in current:
+        return {}
+    out = f"/tmp/fleet_cyclonedds_robot_{ip}.xml"
+    xml = cyclone_unicast.build_xml(ip, cyclone_unicast.local_ip_for(ip))
+    with open(out, "w", encoding="utf-8") as fh:
+        fh.write(xml)
+    return {"CYCLONEDDS_URI": f"file://{out}"}
+
+
 def clock_command(ip: str) -> str:
     """Comando do passo 8 do roteiro: acerta o relógio do robô pelo do PC."""
     return f"ssh ubuntu@{ip} \"sudo date -s '@$(date +%s.%N)'\""
@@ -135,6 +163,7 @@ class RobotLink:
         self._procs: list[tuple[str, subprocess.Popen]] = []
         self._fleet_ready = False
         self._worker: Optional[threading.Thread] = None
+        self._dds: dict = {}  # CYCLONEDDS_URI unicast para o IP da tela
 
     # ── estado ────────────────────────────────────────────────────────────
     def status(self) -> dict:
@@ -192,6 +221,11 @@ class RobotLink:
             self._set(phase="error", message=detail)
             return
 
+        try:
+            self._dds = dds_env(ip, self._ros_env(), self._ros_ws)
+        except Exception as exc:  # sem o XML, cai no multicast de antes
+            self._dds = {}
+            self._append("dds", f"config unicast não gerada ({exc}); usando multicast")
         self._set(message="Rede OK. Checagem pré-voo (só escuta o robô, ~15 s)…")
         try:
             output, code = self._run_preflight()
@@ -219,7 +253,7 @@ class RobotLink:
         script = os.path.join(self._ros_ws, "scripts", "robot_preflight.py")
         cmd = " ".join(shlex.quote(c) for c in
                        ["python3", script, "--ignore-nodes", *BACKEND_NODES])
-        env = {**self._ros_env(), "PYTHONUNBUFFERED": "1"}
+        env = {**self._ros_env(), **self._dds, "PYTHONUNBUFFERED": "1"}
         result = subprocess.run(
             ["bash", "-c", self._setup_prefix() + cmd],
             capture_output=True, text=True, timeout=PREFLIGHT_TIMEOUT_S,
@@ -228,7 +262,7 @@ class RobotLink:
         return (result.stdout or "") + (result.stderr or ""), result.returncode
 
     def _start_processes(self) -> None:
-        env = {**self._ros_env(), "PYTHONUNBUFFERED": "1", "FLEET_USE_SIM_TIME": "false"}
+        env = {**self._ros_env(), **self._dds, "PYTHONUNBUFFERED": "1", "FLEET_USE_SIM_TIME": "false"}
         self._fleet_ready = False
         for tag, cmd in launch_commands(env):
             shell_cmd = self._setup_prefix() + " ".join(shlex.quote(c) for c in cmd)
@@ -263,7 +297,7 @@ class RobotLink:
             result = subprocess.run(
                 ["bash", "-c", self._setup_prefix() + f"python3 {shlex.quote(script)}"],
                 capture_output=True, text=True, timeout=SIGNAL_TIMEOUT_S,
-                cwd=self._ros_ws, env={**self._ros_env(), "PYTHONUNBUFFERED": "1"},
+                cwd=self._ros_ws, env={**self._ros_env(), **self._dds, "PYTHONUNBUFFERED": "1"},
             )
             ok = result.returncode == 0
             detail = (result.stdout or result.stderr or "").strip().splitlines()[-1:] or [""]

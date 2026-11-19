@@ -7,7 +7,20 @@
 # ROBOT_NAMESPACE: namespace do robô (ex.: tb1 para /tb1/scan, /tb1/odom).
 #   O TurtleBot4 do CIn publica com namespace /tb1.
 #   make robot-up ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
+# Descoberta do DDS por unicast (19/11/2026): na rede do TurtleBot4 do CIn o
+# multicast do DDS não chega ao PC. Com ROBOT_IP, o docker/entrypoint.sh gera um
+# XML do CycloneDDS com o robô como peer (fleet_ws/scripts/cyclone_unicast.py).
+# docker/ e fleet_ws/scripts/ vêm da pasta do repositório, então essa correção
+# vale com `git pull`, sem refazer a imagem. ROBOT_DDS_UNICAST=false desliga.
+x-robot-common: &robot-common
+  entrypoint: ["bash", "/workspace/docker/entrypoint.sh"]
+  volumes:
+    - ./docker:/workspace/docker:ro
+    - ./fleet_ws/scripts:/workspace/fleet_ws/scripts:ro
+
 x-robot-env: &robot-env
+  ROBOT_IP: ${ROBOT_IP:-}
+  ROBOT_DDS_UNICAST: ${ROBOT_DDS_UNICAST:-true}
   ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-0}
   RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
   FLEET_USE_SIM_TIME: "false"
@@ -16,7 +29,8 @@ x-robot-env: &robot-env
 
 services:
   sim:
-    command: ["/workspace/docker/run-robot.sh"]
+    <<: *robot-common
+    command: ["bash", "/workspace/docker/run-robot.sh"]
     environment:
       <<: *robot-env
       ROBOT_MAP: ${ROBOT_MAP:-hall_cin_v4}
@@ -27,10 +41,14 @@ services:
       NAV2_NAVFN_USE_ASTAR: ${NAV2_NAVFN_USE_ASTAR:-true}
       NAV2_CONTROLLER: ${NAV2_CONTROLLER:-}  # dwb = o controlador do artigo (Humble); vazio = MPPI
   fleet:
+    <<: *robot-common
+    command: ["bash", "/workspace/docker/run-fleet.sh"]
     environment:
       <<: *robot-env
       FLEET_START_DELAY: ${FLEET_START_DELAY:-10}
   backend:
+    <<: *robot-common
+    command: ["bash", "/workspace/docker/run-backend.sh"]
     environment:
       <<: *robot-env
       BACKEND_START_DELAY: ${BACKEND_START_DELAY:-14}
@@ -38,7 +56,6 @@ services:
       # orquestrador como processos do backend (backend/robot_link.py), com os
       # mesmos parâmetros do serviço sim acima.
       FLEET_ROBOT_MODE: ${FLEET_ROBOT_MODE:-false}
-      ROBOT_IP: ${ROBOT_IP:-}
       # Ao conectar, o robô gira ~10° e volta (robot_wiggle.py); false desliga.
       ROBOT_CONNECT_WIGGLE: ${ROBOT_CONNECT_WIGGLE:-true}
       ROBOT_MAP: ${ROBOT_MAP:-hall_cin_v4}
@@ -49,5 +66,7 @@ services:
       NAV2_NAVFN_USE_ASTAR: ${NAV2_NAVFN_USE_ASTAR:-true}
       NAV2_CONTROLLER: ${NAV2_CONTROLLER:-}
   frontend:
+    <<: *robot-common
+    command: ["bash", "/workspace/docker/run-frontend.sh"]
     environment:
       <<: *robot-env

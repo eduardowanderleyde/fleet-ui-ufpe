@@ -89,19 +89,24 @@ cbsoft-analise:
 #   O TurtleBot4 do CIn publica com namespace /tb1:
 #   make robot-check ROBOT_NAMESPACE=tb1
 #
-# ROBOT_IP (opcional): IP do robô para Cyclone DDS unicast.
-#   Só necessário se multicast não funcionar na rede (raro).
-#   make robot-check ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
+# ROBOT_IP: IP do robô. Com ele, o PC procura o robô por unicast no DDS, porque
+#   na rede do TurtleBot4 do CIn a descoberta por multicast não chega ao PC
+#   (19/11/2026). O robô também precisa do IP do PC como peer: ver
+#   docs/ufpe/robo_real.md. ROBOT_DDS_UNICAST=false volta ao multicast.
+#   make robot-check-humble ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
 ROBOT_DOMAIN ?= 0
 ROBOT_RMW ?= rmw_cyclonedds_cpp
 ROBOT_NAMESPACE ?=
 ROBOT_IP ?=
+ROBOT_DDS_UNICAST ?= true
 
 robot-check:
 	$(COMPOSE) run --rm --no-deps \
 		-e ROS_DOMAIN_ID=$(ROBOT_DOMAIN) \
 		-e RMW_IMPLEMENTATION=$(ROBOT_RMW) \
 		-e ROBOT_NAMESPACE=$(ROBOT_NAMESPACE) \
+		-e ROBOT_IP=$(ROBOT_IP) \
+		-e ROBOT_DDS_UNICAST=$(ROBOT_DDS_UNICAST) \
 		-e ROS_DISTRO=$(ROS_DISTRO) \
 		-e TZ=$(TZ_LOCAL) \
 		-v $(CURDIR)/fleet_ws/scripts:/workspace/fleet_ws/scripts:ro \
@@ -121,13 +126,14 @@ robot-check:
 # ROBÔ REAL: USE HUMBLE (Jazzy não descobre o robô Humble via DDS)
 # ══════════════════════════════════════════════════════════════════════════════
 #   make robot-build-humble                              # build da imagem (~15-20 min)
-#   make robot-check-humble ROBOT_NAMESPACE=tb1          # checagem pré-voo
+#   make robot-check-humble ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11   # checagem pré-voo
 #   make robot-up-humble ROBOT_NAMESPACE=tb1 ROBOT_IP=192.168.50.11
 #
 # Ao conectar, o robô gira ~10° e volta, no lugar (ROBOT_CONNECT_WIGGLE=false desliga).
 ROBOT_CONNECT_WIGGLE ?= true
 ROBOT_ENV = ROS_DOMAIN_ID=$(ROBOT_DOMAIN) RMW_IMPLEMENTATION=$(ROBOT_RMW) TZ=$(TZ_LOCAL) \
 	NAV2_CONTROLLER=$(NAV2_CONTROLLER) ROBOT_IP=$(ROBOT_IP) ROBOT_CONNECT_WIGGLE=$(ROBOT_CONNECT_WIGGLE) \
+	ROBOT_DDS_UNICAST=$(ROBOT_DDS_UNICAST) \
 	ROBOT_NAMESPACE=$(ROBOT_NAMESPACE) ROS_DISTRO=$(ROS_DISTRO)
 ROBOT_COMPOSE = $(COMPOSE) -f docker-compose.yml -f docker-compose.robot.yml
 
@@ -157,9 +163,10 @@ robot-check-humble:
 		-e ROS_DOMAIN_ID=$(ROBOT_DOMAIN) \
 		-e RMW_IMPLEMENTATION=$(ROBOT_RMW) \
 		-e ROBOT_NAMESPACE=$(ROBOT_NAMESPACE) \
+		-e ROBOT_IP=$(ROBOT_IP) \
+		-e ROBOT_DDS_UNICAST=$(ROBOT_DDS_UNICAST) \
 		-e ROS_DISTRO=humble \
 		-e TZ=$(TZ_LOCAL) \
-		-v $(CURDIR)/fleet_ws/scripts:/workspace/fleet_ws/scripts:ro \
 		-v $(CURDIR)/backend:/workspace/backend:ro \
 		-w /workspace/fleet_ws backend \
 		bash -c "source /opt/ros/humble/setup.bash && python3 scripts/robot_preflight.py"
