@@ -4,11 +4,14 @@ import time
 import unittest
 from pathlib import Path
 
-import rclpy
-from rclpy.executors import SingleThreadedExecutor
-from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
-from sensor_msgs.msg import LaserScan
+try:
+    import rclpy
+    from rclpy.executors import SingleThreadedExecutor
+    from rclpy.node import Node
+    from rclpy.qos import qos_profile_sensor_data
+    from sensor_msgs.msg import LaserScan
+except ImportError:  # CI sem ROS: pula, como os outros testes que usam rclpy
+    raise unittest.SkipTest("requer rclpy (source /opt/ros/<distro>/setup.bash)")
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "fleet_ws" / "scripts"))
